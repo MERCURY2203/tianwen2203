@@ -1,0 +1,44 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.xiaoshouji.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "io.github.mercury2203.xiaoshouji"
+        minSdk 24
+        targetSdk 34
+        versionCode = (System.getenv("VERSION_CODE") ?: "1").toInteger()
+        versionName = (System.getenv("VERSION_NAME") ?: "0.1-test")
+    }
+
+    signingConfigs {
+        release {
+            // 固定的签名：以后发新版本可以直接覆盖安装，数据不会丢
+            storeFile file("../xiaoshouji.keystore")
+            storePassword = (System.getenv("KEYSTORE_PASSWORD") ?: "")
+            keyAlias "xiaoshouji"
+            // 新旧两种签名都带上，老一些的手机也能装
+            enableV1Signing true
+            enableV2Signing true
+            keyPassword = (System.getenv("KEYSTORE_PASSWORD") ?: "")
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+    implementation 'androidx.core:core:1.13.1'
+}

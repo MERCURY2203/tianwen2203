@@ -1,0 +1,811 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>世界線寫作台</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+/* Layout: a quiet writing desk — narrow work list on the left, one manuscript sheet in the middle. */
+:root{
+  --bg:#eef1ef; --surface:#f8faf9; --paper:#fcfcfa; --ink:#1c2422; --muted:#5b6965; --line:#d3dbd8; --rule:#e3e9e6;
+  --accent:#2b5d55; --accent-soft:#dce9e5; --on-accent:#ffffff;
+  --warn:#8e5410; --warn-soft:#f6ead9; --danger:#a3362e; --danger-soft:#f6e1de; --ok:#2e6b3f;
+  --f-display:"Noto Serif TC","Songti TC","SimSun",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-text:"Noto Serif TC","Songti TC","SimSun",serif;
+  --r:8px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111614; --surface:#181e1c; --paper:#161b19; --ink:#e3e9e6; --muted:#97a5a0; --line:#2d3633; --rule:#232a28;
+  --accent:#86bdb0; --accent-soft:#1f302c; --on-accent:#0e1412;
+  --warn:#e2ab61; --warn-soft:#2e2414; --danger:#e8857b; --danger-soft:#33201d; --ok:#83c795; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111614; --surface:#181e1c; --paper:#161b19; --ink:#e3e9e6; --muted:#97a5a0; --line:#2d3633; --rule:#232a28;
+  --accent:#86bdb0; --accent-soft:#1f302c; --on-accent:#0e1412;
+  --warn:#e2ab61; --warn-soft:#2e2414; --danger:#e8857b; --danger-soft:#33201d; --ok:#83c795; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:700}
+h1{font-size:1.6rem} h2{font-size:1.25rem} h3{font-size:1.02rem}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+textarea{resize:vertical;line-height:1.7}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+label{display:grid;gap:4px;font-size:.88rem;color:var(--muted)}
+button{cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--surface);padding:7px 14px;white-space:nowrap}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+button.danger{color:var(--danger)}
+button.link{border:none;background:none;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+button.chip{border-radius:999px;padding:4px 12px;font-size:.88rem}
+button.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stack{display:grid;gap:12px}
+.muted{color:var(--muted)} .small{font-size:.85rem}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.note{border-radius:6px;padding:10px 12px;font-size:.9rem}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note.err{background:var(--danger-soft);color:var(--danger)}
+.note.info{background:var(--accent-soft);color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:.82rem;background:var(--accent-soft);color:var(--accent)}
+.pill.trial{background:var(--warn-soft);color:var(--warn)}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;color:var(--muted)}
+
+/* Login */
+.login{max-width:420px;margin:8vh auto 0;display:grid;gap:18px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.05rem;letter-spacing:.06em}
+.brand b{color:var(--accent)}
+.demo-keys{display:grid;gap:6px;font-size:.88rem}
+.demo-keys code{font-family:ui-monospace,Menlo,monospace;background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:4px}
+
+/* App frame */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.frame{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:760px){.frame{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:10px}
+.works{display:grid;gap:4px}
+.work{all:unset;cursor:pointer;display:block;padding:9px 12px;border-radius:6px;font-family:var(--f-display);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.work:hover{background:var(--surface)}
+.work[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+.work:focus-visible{outline:2px solid var(--accent)}
+.work small{display:block;font-family:var(--f-body);font-weight:400;font-size:.78rem;color:var(--muted)}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:14px 0 18px;overflow-x:auto}
+.tab{all:unset;cursor:pointer;padding:9px 14px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--accent);font-weight:500}
+.tab:focus-visible{outline:2px solid var(--accent)}
+
+/* Manuscript */
+.sheet{font-family:var(--f-text);font-size:1.05rem;line-height:2.1;background-color:var(--paper);
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(2.1em - 1px),var(--rule) calc(2.1em - 1px),var(--rule) 2.1em);
+  background-attachment:local;border:1px solid var(--line);border-radius:6px;padding:0 18px;min-height:280px;white-space:pre-wrap}
+textarea.sheet{width:100%}
+.sheet-read{padding:2px 18px 10px;overflow-wrap:anywhere}
+.count{font-size:.82rem;color:var(--muted)}
+details>summary{cursor:pointer;color:var(--accent);font-size:.92rem;padding:4px 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.compare .sheet{min-height:0;padding:4px 14px}
+.compare h3{font-size:.9rem;margin-bottom:6px;font-family:var(--f-body);color:var(--muted);font-weight:500}
+.thinking{display:inline-flex;gap:8px;align-items:center;color:var(--muted);font-size:.9rem}
+.thinking::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.thinking::before{animation:none}}
+
+/* Characters & chapters */
+.char{border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px;background:var(--paper)}
+.char-log{font-size:.88rem;display:grid;gap:4px;border-top:1px dashed var(--line);padding-top:8px}
+.chapters{display:grid;gap:0;border-top:1px solid var(--line)}
+.chap{all:unset;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:11px 6px;border-bottom:1px solid var(--line)}
+.chap:hover{background:var(--surface)}
+.chap[aria-current="true"]{background:var(--accent-soft)}
+.chap:focus-visible{outline:2px solid var(--accent)}
+.chap .idx{font-family:var(--f-display);color:var(--accent);font-weight:700}
+.chap .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-display)}
+.records{display:grid;gap:8px;font-size:.88rem}
+.records ul{margin:2px 0 0;padding-left:18px}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-weight:500;color:var(--muted);font-size:.82rem;letter-spacing:.04em}
+td code{font-family:ui-monospace,Menlo,monospace}
+
+/* Modal */
+.scrim{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 40%,transparent);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;max-width:620px;width:100%;max-height:86vh;overflow:auto;display:grid;gap:14px}
+.checks{display:grid;gap:6px}
+.checks label{display:flex;gap:8px;align-items:flex-start;color:var(--ink);font-size:.92rem}
+.checks input{width:auto;margin-top:5px}
+.empty{padding:40px 10px;text-align:center;color:var(--muted);display:grid;gap:10px;justify-items:center}
+</style>
+
+<div class="wrap" id="root"></div>
+<div id="modal-host"></div>
+
+<script>
+(() => {
+"use strict";
+/* ---------- storage ---------- */
+const KEY = "worldline_proto_v1";
+let storageOK = true;
+function load(){ try{ const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; }catch(e){ storageOK=false; return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ storageOK=false; } }
+const uid = () => Math.random().toString(36).slice(2,10);
+const clone = o => JSON.parse(JSON.stringify(o));
+const count = t => (t||"").replace(/\s/g,"").length;
+const fmt = n => Number(n).toLocaleString("zh-TW");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const CN = n => { const d="零一二三四五六七八九"; if(n<=10) return n===10?"十":d[n]; if(n<20) return "十"+d[n%10]; if(n<100) return d[Math.floor(n/10)]+"十"+(n%10?d[n%10]:""); return String(n); };
+
+function newCard(key,type,balance){ return {key,type,balance:type==="paid"?balance:0,trialLeft:type==="trial"?3:0,created:Date.now(),novels:[],styles:[]}; }
+function newNovel(title){ const line={id:uid(),name:"主線",parent:null,chapters:[]}; return {id:uid(),title,created:Date.now(),base:{world:"",rules:""},chars:[],lines:[line],currentLine:line.id}; }
+
+function seed(){
+  const demo = newCard("DEMO-8888","paid",20000);
+  const n = newNovel("霧港來信（示例）");
+  n.base.world = "架空民國風港口城市「霧港」，常年起霧。城中郵政由「信局」壟斷，所有信件都要先經過檢信房檢查才能投遞。";
+  n.base.rules = "1. 沒有超自然力量，死者不會復活。\n2. 霧港與外界只有一條鐵路相連。";
+  n.chars = [
+    {id:uid(),name:"沈默",personality:"話少，觀察細，遇事先退一步再判斷",bottomLine:"不會把別人託付給他的秘密說出去",notes:"二十四歲，檢信房檢信員，左手有舊傷"},
+    {id:uid(),name:"林照",personality:"爽朗，愛打聽，心軟",bottomLine:"不會對走投無路的人撒手不管",notes:"茶館老闆娘"}
+  ];
+  n.lines[0].chapters.push({id:uid(),title:"第一章 退回的信",versions:[],
+    text:"霧是從碼頭那邊漫過來的，到檢信房窗外時已經濃得看不清對街的招牌。沈默把今天第四十七封信放回筐裡，手指在信封角上停了一下。\n這封信沒有寄件人，收件地址寫的是城西舊鐘樓。鐘樓十年前就塌了，地址早已作廢，按規矩該蓋「無法投遞」的章，退回信局。\n他拿起章，又放下。信封背面用鉛筆寫著一行很小的字：如果沒人收，請交給沈默。\n檢信房裡只有他一個人。鍋爐管子響了兩聲，像有人在隔壁敲牆。\n下班的時候，他把那封信夾進了自己的賬本。\n林照的茶館在回家路上。她看見他進門，往他杯裡多放了一撮茶葉。\n「今天臉色不對。」她說。\n「霧大。」\n「霧哪天不大。」她沒再問，轉身去招呼別的客人了。",
+    records:{settings:["城西舊鐘樓十年前倒塌，地址已作廢"],events:["沈默在檢信房發現一封寫明交給他的無主信件，私自帶回家","沈默去林照的茶館，林照察覺他神色有異"],chars:[{name:"沈默",change:"違反檢信房規矩，私自帶走一封信"},{name:"林照",change:"察覺沈默有心事，但沒有追問"}]}});
+  demo.novels.push(n);
+  demo.styles.push({id:uid(),name:"冷淡白描",text:"他把門關上，屋裡更暗了。桌上的茶已經涼透，他沒倒，坐下來，盯著窗紙上那一點將熄的光。"});
+  return {adminPwd:"admin",session:null,cards:{"DEMO-8888":demo,"TRY-0001":newCard("TRY-0001","trial",0)}};
+}
+let S = load() || seed();
+save();
+
+/* ---------- runtime capabilities ---------- */
+let sample = null, downloads = null, capsReady = false;
+(async () => {
+  await 0;
+  try{ const c = window.claude; if(c && c.use){ [sample, downloads] = await Promise.all([c.use("sample"), c.use("downloads")]); } }catch(e){}
+  capsReady = true; render();
+})();
+
+/* ---------- ui state ---------- */
+const ui = { view: S.session && S.cards[S.session] ? "app" : "login", admin:false, novelId:null, tab:"write",
+  draft:null, gen:null, rewrite:null, chapId:null, editing:null, loginErr:"", adminMsg:"", newNovel:false };
+const card = () => S.cards[S.session];
+const novel = () => card()?.novels.find(n=>n.id===ui.novelId);
+const line = (n=novel()) => n?.lines.find(l=>l.id===n.currentLine);
+
+/* ---------- prompt building ---------- */
+const RULES = `【內容規則】
+- 涉及現實政治的內容一律不寫：現實中的政黨、國家領導人、政治人物、政治事件、政治運動、敏感歷史、國家主權與領土爭議、民族與宗教衝突。遇到時不寫正文，只輸出一行：【無法生成】加一句原因。架空世界裡虛構的朝廷、權謀不算。
+- 可以寫成年角色之間的感情與親密情節，點到為止，不作露骨的性描寫。任何涉及未成年人的性或曖昧內容一律不寫。`;
+const STYLE = `【默認文風】
+- 少用副詞和堆砌的形容詞，用動作和細節說話。
+- 不要模板化分段：段落長短要有變化，不要每段都是「描寫＋感受＋總結」的同一結構。
+- 句子和段落的開頭不要雷同，不要反覆用「他」「她」「這時」「然而」起句。
+- 不寫說教和總結式結尾，不刻意討好讀者，不寫空洞的抒情。
+- 對話要像真人說話，可以短、可以答非所問。`;
+
+function context(n, l, uptoIdx){
+  const chs = uptoIdx==null ? l.chapters : l.chapters.slice(0,uptoIdx);
+  let s = `【作品】${n.title}\n`;
+  if(n.base.world.trim()) s += `【世界設定（用戶提供，不可違背）】\n${n.base.world.trim()}\n`;
+  if(n.base.rules.trim()) s += `【必須遵守的規則（用戶提供，不可違背）】\n${n.base.rules.trim()}\n`;
+  if(n.chars.length){
+    s += `【人物檔案（用戶提供，不可違背）】\n`;
+    n.chars.forEach(c=>{
+      s += `- ${c.name}｜性格傾向：${c.personality||"未定"}｜行為底線（絕不會做的事）：${c.bottomLine||"未定"}${c.notes?"｜其他："+c.notes:""}\n`;
+      const log = []; chs.forEach((ch,i)=> (ch.records?.chars||[]).filter(x=>x.name===c.name).forEach(x=>log.push(`第${i+1}章：${x.change}`)));
+      if(log.length) s += `  經歷與關係變化：${log.join("；")}\n`;
+    });
+  }
+  const extraSet = chs.flatMap(ch=>ch.records?.settings||[]);
+  if(extraSet.length) s += `【在正文中確立的設定（已確認，不可違背）】\n${extraSet.map(x=>"- "+x).join("\n")}\n`;
+  if(chs.length){
+    s += `【已發生的事件（已確認，不可違背）】\n`;
+    chs.forEach((ch,i)=>{ const ev=ch.records?.events||[]; s += `第${i+1}章「${ch.title}」：${ev.length?ev.join("；"):"（無記錄）"}\n`; });
+    const last = chs[chs.length-1].text; s += `【上一章結尾】\n${last.slice(-700)}\n`;
+  }
+  return s;
+}
+
+function genPrompt(n, l, d){
+  return `你是一位中文小說作者，負責為用戶寫小說正文。
+
+${RULES}
+
+【設定規則】
+- 下面標明「不可違背」的內容是已確定的事實，正文不能與之矛盾。
+- 沒有寫明的部分可以自由發揮。
+- 如果用戶這次的想法與已確定的事實矛盾，不要寫正文，只輸出：以「【設定衝突】」開頭，簡要說明哪一條想法與哪一條設定矛盾，並給出兩種可行的處理方式。${d.override?"\n- 用戶已確認：這次的想法與舊設定有衝突時，以這次想法為準，直接寫正文。":""}
+
+${STYLE}
+${d.styleText?`\n【文風參考片段】模仿它的語感、節奏和用詞習慣，不要照抄內容：\n${d.styleText}\n`:""}
+${context(n,l)}
+【本次想法】
+${d.idea}${d.extra?`\n【額外要求】\n${d.extra}`:""}
+
+【輸出要求】直接輸出正文，不要章節標題，不要任何說明、前言或結語。篇幅約 ${d.length} 字（按中文字符計），不要超過 ${Math.round(d.length*1.1)} 字。`;
+}
+
+const MODES = {
+  less:"減少修飾：刪掉多餘的副詞、形容詞和比喻，讓句子更乾淨，意思不變。",
+  dialog:"調整對話：讓對話更自然、更像真人說話，符合人物性格，可以調整對話前後的動作描寫。",
+  expand:"擴寫：在不改變劇情事實的前提下，補充動作、細節和環境，篇幅擴大到原來的一倍半到兩倍。",
+  shrink:"壓縮：保留劇情事實和關鍵細節，篇幅壓縮到原來的一半左右。",
+  custom:""
+};
+
+/* ---------- generation ---------- */
+const ERR = { not_granted:"你沒有允許這個頁面使用 Claude，所以無法生成。重新打開頁面後可以再次允許。",
+  rate_limited:"請求太頻繁，請稍等一會再試。", cancelled:"已停止。這次沒有扣費。" };
+const errText = e => ERR[e?.code] || `生成失敗（${e?.message||e?.code||"未知錯誤"}）。這次沒有扣費。`;
+
+function trimTo(text, max){
+  if(count(text)<=max) return text;
+  let out="", c=0;
+  for(const ch of text){ if(!/\s/.test(ch)) c++; if(c>max) break; out+=ch; }
+  const cut = Math.max(out.lastIndexOf("。"),out.lastIndexOf("！"),out.lastIndexOf("？"),out.lastIndexOf("」"));
+  return cut>out.length*0.6 ? out.slice(0,cut+1) : out;
+}
+
+async function generate(override){
+  const n = novel(), l = line(n), cd = card();
+  const d = ui.form; if(!d.idea.trim()){ ui.formErr="先寫下這一章想寫什麼。"; render(); return; }
+  const trial = cd.type==="trial";
+  if(trial && cd.trialLeft<=0){ ui.formErr="體驗次數已用完。"; render(); return; }
+  const length = trial ? 500 : Number(d.length);
+  if(!trial && cd.balance < length){ ui.formErr=`餘額不足：這次預計需要約 ${fmt(length)} 字，卡內剩 ${fmt(cd.balance)} 字。`; render(); return; }
+  let styleText = "";
+  if(d.style==="__new"){ styleText = d.newStyle.trim();
+    if(styleText && d.saveStyle){ cd.styles.push({id:uid(),name:d.newStyleName.trim()||`片段 ${cd.styles.length+1}`,text:styleText}); d.style=cd.styles[cd.styles.length-1].id; d.newStyle=""; save(); } }
+  else if(d.style){ styleText = cd.styles.find(s=>s.id===d.style)?.text||""; }
+  ui.formErr="";
+  const req = {idea:d.idea.trim(),extra:d.extra.trim(),length,styleText,override:!!override,title:d.title.trim()};
+  ui.draft = {novelId:n.id, lineId:l.id, req, text:"", status:"streaming", trial, rewriteLeft:trial?1:Infinity, msg:""};
+  ui.rewrite = null;
+  const ctl = new AbortController(); ui.gen = ctl; render();
+  try{
+    const r = await sample(genPrompt(n,l,req), {signal:ctl.signal, cache:false, modelTier:"default",
+      onText:({text})=>{ ui.draft.text=text; paintDraft(); }});
+    let text = r.text.trim();
+    if(text.startsWith("【設定衝突】")){ ui.draft.status="conflict"; ui.draft.text=text; }
+    else if(text.startsWith("【無法生成】")){ ui.draft.status="blocked"; ui.draft.text=text; }
+    else {
+      if(trial) text = trimTo(text,500);
+      const used = count(text);
+      ui.draft.text = text; ui.draft.status="done"; ui.draft.charged = used;
+      if(trial){ cd.trialLeft -= 1; } else { cd.balance = Math.max(0, cd.balance - used); }
+      ui.draft.msg = trial ? `已用 1 次體驗（剩 ${cd.trialLeft} 次）` : `本次扣費 ${fmt(used)} 字`;
+      if(r.truncated) ui.draft.msg += "。正文被截斷，可以壓縮篇幅後重新生成。";
+      save();
+    }
+  }catch(e){ ui.draft.status="error"; ui.draft.msg = errText(e); if(e?.text) ui.draft.text=e.text; }
+  ui.gen = null; render();
+}
+
+async function runRewrite(){
+  const rw = ui.rewrite, d = ui.draft, cd = card(), n = novel();
+  const instr = rw.mode==="custom" ? rw.custom.trim() : MODES[rw.mode];
+  if(!instr){ rw.err="寫一下你想怎麼改。"; render(); return; }
+  if(d.trial && d.rewriteLeft<=0){ rw.err="體驗卡每次生成只包含一次局部改寫。"; render(); return; }
+  const before = d.text.slice(0,rw.start), sel = d.text.slice(rw.start,rw.end), after = d.text.slice(rw.end);
+  const room = d.trial ? 500 - count(before) - count(after) : null;
+  if(!d.trial && cd.balance < 50){ rw.err="餘額不足，無法改寫。"; render(); return; }
+  rw.err=""; rw.out=""; rw.status="streaming";
+  const ctl = new AbortController(); ui.gen = ctl; render();
+  const prompt = `你在幫用戶局部改寫一段小說正文。只改【要改的片段】，輸出改寫後的片段本身，不要任何說明，不要加引號。
+
+${RULES}
+
+${STYLE}
+
+改寫要求：${instr}
+不能改變與下文銜接所需的劇情事實，人物不能違背設定。${room!=null?`\n改寫後的片段不能超過 ${room} 字（按中文字符計）。`:""}
+
+${context(n,line(n))}
+【前文】
+${before.slice(-600)}
+【要改的片段】
+${sel}
+【後文】
+${after.slice(0,400)}`;
+  try{
+    const r = await sample(prompt,{signal:ctl.signal,cache:false,onText:({text})=>{ rw.out=text; paintRewrite(); }});
+    let out = r.text.trim();
+    if(out.startsWith("【無法生成】")){ rw.status="error"; rw.err=out; }
+    else {
+      if(room!=null && count(out)>room){ out = trimTo(out, room); }
+      rw.out = out; rw.status="done";
+      const used = count(out);
+      if(d.trial){ d.rewriteLeft -= 1; rw.msg="已使用本次的局部改寫。"; }
+      else { cd.balance = Math.max(0, cd.balance-used); rw.msg=`改寫扣費 ${fmt(used)} 字`; }
+      save();
+    }
+  }catch(e){ rw.status="error"; rw.err=errText(e); }
+  ui.gen=null; render();
+}
+
+async function extract(n, l, idx, text){
+  const prompt = `閱讀下面這一章新正文，提取其中「新出現的」信息，只返回 JSON，不要任何其他文字。
+已經存在於背景資料裡的內容不要重複提取。人名必須與人物檔案裡的名字一致。
+
+返回格式：
+{"settings":["新確立的世界或背景設定，一句話一條"],
+ "events":["這一章發生的關鍵事件，一句話一條，3~6 條"],
+ "chars":[{"name":"人物名","change":"這一章裡該人物的經歷或關係變化，一句話"}],
+ "newChars":[{"name":"新出場人物名","personality":"從正文看出的性格傾向","bottomLine":"正文明確顯示的底線，看不出就留空"}]}
+
+【背景資料】
+${context(n,l,idx)}
+【新正文】
+${text}`;
+  const v = await sample.json(prompt,{cache:false});
+  const arr = x => Array.isArray(x)?x:[];
+  return {settings:arr(v?.settings).map(String),events:arr(v?.events).map(String),
+    chars:arr(v?.chars).filter(c=>c&&c.name).map(c=>({name:String(c.name),change:String(c.change||"")})),
+    newChars:arr(v?.newChars).filter(c=>c&&c.name&&!n.chars.some(x=>x.name===c.name)).map(c=>({name:String(c.name),personality:String(c.personality||""),bottomLine:String(c.bottomLine||"")}))};
+}
+
+/* ---------- adopt modal ---------- */
+async function openAdopt(target){
+  // target: {kind:"draft"} or {kind:"chapter", lineId, chapId}
+  const n = novel(); const l = target.kind==="draft" ? n.lines.find(x=>x.id===ui.draft.lineId) : n.lines.find(x=>x.id===target.lineId);
+  const idx = target.kind==="draft" ? l.chapters.length : l.chapters.findIndex(c=>c.id===target.chapId);
+  const text = target.kind==="draft" ? ui.draft.text : l.chapters[idx].text;
+  const m = {target, n, l, idx, text, status:"loading", data:null, err:"", title: target.kind==="draft" ? (ui.draft.req.title || `第${CN(idx+1)}章`) : l.chapters[idx].title};
+  ui.modal = {type:"adopt", m}; renderModal();
+  try{ m.data = await extract(n,l,idx,text); m.status="ready"; }
+  catch(e){ m.status="error"; m.err = errText(e).replace("這次沒有扣費。",""); }
+  renderModal();
+}
+function commitAdopt(){
+  const m = ui.modal.m, host = document.getElementById("modal-host");
+  const pick = (g) => [...host.querySelectorAll(`input[data-g="${g}"]`)].filter(i=>i.checked).map(i=>Number(i.dataset.i));
+  const rec = m.data ? {settings:pick("settings").map(i=>m.data.settings[i]),events:pick("events").map(i=>m.data.events[i]),chars:pick("chars").map(i=>m.data.chars[i])} : {settings:[],events:[],chars:[]};
+  const newChars = m.data ? pick("newChars").map(i=>m.data.newChars[i]) : [];
+  const title = (host.querySelector("#adopt-title")?.value||"").trim() || `第${CN(m.idx+1)}章`;
+  newChars.forEach(c=>m.n.chars.push({id:uid(),name:c.name,personality:c.personality,bottomLine:c.bottomLine,notes:""}));
+  if(m.target.kind==="draft"){
+    m.l.chapters.push({id:uid(),title,text:m.text,versions:[],records:rec});
+    ui.draft=null; ui.rewrite=null; ui.form.idea=""; ui.form.title="";
+    ui.tab="world"; ui.chapId=m.l.chapters[m.l.chapters.length-1].id; m.n.currentLine=m.l.id;
+  } else { const ch=m.l.chapters[m.idx]; ch.records=rec; ch.title=title; }
+  save(); ui.modal=null; renderModal(); render();
+}
+
+/* ---------- export ---------- */
+function bookText(n,l){ return [n.title,"",...l.chapters.flatMap(c=>[c.title,"",c.text,"",""])].join("\n").trim()+"\n"; }
+const xml = s => String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"");
+async function makeDocx(n,l){
+  const para = (t,opt={}) => `<w:p><w:pPr>${opt.center?'<w:jc w:val="center"/>':""}<w:spacing w:after="${opt.after??120}" w:line="400" w:lineRule="auto"/>${opt.indent?'<w:ind w:firstLineChars="200" w:firstLine="480"/>':""}</w:pPr><w:r><w:rPr><w:rFonts w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="宋体"/>${opt.bold?"<w:b/>":""}<w:sz w:val="${opt.size||24}"/></w:rPr><w:t xml:space="preserve">${xml(t)}</w:t></w:r></w:p>`;
+  let body = para(n.title,{center:true,bold:true,size:40,after:480});
+  l.chapters.forEach(c=>{ body += para(c.title,{center:true,bold:true,size:30,after:240});
+    c.text.split(/\n+/).filter(p=>p.trim()).forEach(p=>body+=para(p.trim(),{indent:true})); });
+  const zip = new JSZip();
+  zip.file("[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  zip.file("_rels/.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  zip.file("word/document.xml",`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="851" w:footer="992" w:gutter="0"/></w:sectPr></w:body></w:document>`);
+  return zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+}
+async function doExport(kind){
+  const n=novel(), l=line(n);
+  if(!l.chapters.length){ ui.exportMsg="這條世界線還沒有採納的章節。"; render(); return; }
+  const base = `${n.title.replace(/[\\/:*?"<>|（）()]/g,"").trim()||"小說"}-${l.name.replace(/[\\/:*?"<>|（）()\s]/g,"")}`;
+  try{
+    if(kind==="txt") await downloads.save({filename:base+".txt",data:new Blob(["﻿"+bookText(n,l)],{type:"text/plain;charset=utf-8"})});
+    else { if(!window.JSZip) throw {message:"Word 組件沒有加載成功"}; await downloads.save({filename:base+".docx",data:await makeDocx(n,l)}); }
+    ui.exportMsg="";
+  }catch(e){ ui.exportMsg = e?.code==="declined" ? "" : `導出失敗（${e?.message||e?.code}）`; }
+  render();
+}
+
+/* ---------- rendering ---------- */
+const $root = document.getElementById("root");
+function render(){
+  if(ui.view==="login") $root.innerHTML = ui.admin ? viewAdmin() : viewLogin();
+  else if(!card()){ ui.view="login"; S.session=null; save(); return render(); }
+  else $root.innerHTML = viewApp();
+  afterRender();
+}
+function storageNote(){ return storageOK ? "" : `<p class="note warn">這個瀏覽器不允許保存數據，關閉頁面後內容會丟失。</p>`; }
+
+function viewLogin(){
+  return `<section class="login">
+    <div class="brand">世界線<b>寫作台</b></div>
+    <div class="panel stack">
+      <h1>輸入卡密</h1>
+      <p class="muted small">卡密由管理員發放。作品只保存在你自己的卡密下，其他人看不到。</p>
+      <form id="login-form" class="stack">
+        <label>卡密<input id="card-key" autocomplete="off" placeholder="例如 DEMO-8888" value=""></label>
+        ${ui.loginErr?`<p class="note err">${esc(ui.loginErr)}</p>`:""}
+        <button class="primary" type="submit">進入</button>
+      </form>
+    </div>
+    <div class="demo-keys muted">
+      <span class="eyebrow">原型示例卡密</span>
+      <span><code>DEMO-8888</code> 正式卡，含示例作品和 2 萬字餘額</span>
+      <span><code>TRY-0001</code> 體驗卡，3 次，每次不超過 500 字</span>
+    </div>
+    <div class="row"><button class="link" data-act="to-admin">管理後台</button></div>
+    ${storageNote()}
+  </section>`;
+}
+
+function viewAdmin(){
+  if(!ui.adminAuthed) return `<section class="login">
+    <div class="brand">世界線<b>寫作台</b> · 管理後台</div>
+    <form id="admin-login" class="panel stack">
+      <h1>管理員登入</h1>
+      <label>管理密碼<input id="admin-pwd" type="password" autocomplete="off"></label>
+      <p class="muted small">原型的默認密碼是 admin。</p>
+      ${ui.adminMsg?`<p class="note err">${esc(ui.adminMsg)}</p>`:""}
+      <div class="row"><button class="primary" type="submit">登入</button><button type="button" data-act="back-login">返回</button></div>
+    </form></section>`;
+  const rows = Object.values(S.cards).sort((a,b)=>b.created-a.created).map(c=>`<tr>
+    <td><code>${esc(c.key)}</code></td>
+    <td>${c.type==="trial"?'<span class="pill trial">體驗卡</span>':'<span class="pill">正式卡</span>'}</td>
+    <td class="num">${c.type==="trial"?`剩 ${c.trialLeft} 次`:`${fmt(c.balance)} 字`}</td>
+    <td class="num">${c.novels.length}</td>
+    <td><div class="row">
+      ${c.type==="trial"
+        ? `<button data-act="trial-reset" data-key="${esc(c.key)}">重置為 3 次</button>`
+        : `<input style="width:110px" type="number" min="0" step="1000" id="adj-${esc(c.key)}" placeholder="字數"><button data-act="set-bal" data-key="${esc(c.key)}">設為</button><button data-act="add-bal" data-key="${esc(c.key)}">增加</button>`}
+      <button class="danger" data-act="del-card" data-key="${esc(c.key)}">刪除</button></div></td></tr>`).join("");
+  return `<section class="stack">
+    <div class="top"><div class="brand">世界線<b>寫作台</b> · 管理後台</div><button data-act="back-login">退出後台</button></div>
+    <div class="panel stack">
+      <h2>發放新卡密</h2>
+      <form id="new-card" class="grid2">
+        <label>類型<select id="nc-type"><option value="paid">正式卡（按字數扣費）</option><option value="trial">體驗卡（3 次，每次 ≤500 字）</option></select></label>
+        <label>初始餘額（字）<input id="nc-bal" type="number" min="0" step="1000" value="10000"></label>
+        <label>卡密（留空自動生成）<input id="nc-key" autocomplete="off" placeholder="例如 ZHANG-2026"></label>
+        <div style="align-self:end"><button class="primary" type="submit">生成卡密</button></div>
+      </form>
+      ${ui.adminMsg?`<p class="note info">${esc(ui.adminMsg)}</p>`:""}
+    </div>
+    <div class="panel stack">
+      <h2>全部卡密</h2>
+      <p class="muted small">後台只顯示餘額和作品數量，看不到作品內容。</p>
+      <div class="tbl-wrap"><table><thead><tr><th>卡密</th><th>類型</th><th>餘額</th><th>作品</th><th>操作</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="muted">還沒有卡密</td></tr>'}</tbody></table></div>
+    </div>
+    ${ui.confirmCard?confirmBox(`刪除卡密 ${ui.confirmCard} 會同時刪除它下面的所有作品，無法恢復。`,"do-del-card","cancel-confirm"):""}
+  </section>`;
+}
+function confirmBox(msg,yes,no,yesText="確認刪除"){ return `<div class="note err row" style="justify-content:space-between"><span>${esc(msg)}</span><span class="row"><button class="danger" data-act="${yes}">${yesText}</button><button data-act="${no}">取消</button></span></div>`; }
+
+function viewApp(){
+  const cd = card(); const n = novel();
+  const bal = cd.type==="trial" ? `<span class="pill trial num">體驗卡 · 剩 ${cd.trialLeft} 次</span>` : `<span class="pill num">餘額 ${fmt(cd.balance)} 字</span>`;
+  const works = cd.novels.map(x=>{ const l=line(x); return `<button class="work" data-act="open-novel" data-id="${x.id}" aria-current="${x.id===ui.novelId}">${esc(x.title)}<small>${x.lines.length>1?`${x.lines.length} 條世界線 · `:""}${l.chapters.length} 章</small></button>`; }).join("");
+  return `<header class="top">
+      <div class="row"><div class="brand">世界線<b>寫作台</b></div>${bal}</div>
+      <div class="row small"><span class="muted">卡密 ${esc(cd.key)}</span><button data-act="logout">退出</button></div>
+    </header>
+    ${storageNote()}
+    ${!capsReady?"":!sample?`<p class="note warn">這個頁面需要在 Claude 裡打開才能生成正文。現在可以瀏覽和編輯，但不能生成。</p>`:""}
+    <div class="frame">
+      <aside class="side">
+        <span class="eyebrow">我的作品</span>
+        <div class="works">${works||'<p class="muted small">還沒有作品</p>'}</div>
+        ${ui.newNovel?`<form id="new-novel" class="stack"><input id="nn-title" placeholder="作品名" autocomplete="off"><div class="row"><button class="primary" type="submit">創建</button><button type="button" data-act="cancel-new">取消</button></div></form>`
+          :`<button data-act="new-novel">＋ 新建作品</button>`}
+      </aside>
+      <main style="min-width:0">${n?viewNovel(n):`<div class="empty"><h2>選一部作品開始</h2><p>或者新建一部，先寫下你的想法就可以生成正文。</p></div>`}</main>
+    </div>`;
+}
+
+function viewNovel(n){
+  const l = line(n);
+  const tabs = [["write","寫作"],["setting","設定與人物"],["world","世界線"],["style","文風片段"]]
+    .map(([k,t])=>`<button class="tab" role="tab" data-act="tab" data-tab="${k}" aria-selected="${ui.tab===k}">${t}</button>`).join("");
+  const lineInfo = n.lines.length>1 ? ` · ${esc(l.name)}` : "";
+  return `<div class="row" style="justify-content:space-between"><h1>${esc(n.title)}</h1><span class="muted small num">${l.chapters.length} 章 · ${fmt(l.chapters.reduce((a,c)=>a+count(c.text),0))} 字${lineInfo}</span></div>
+    <div class="tabs" role="tablist">${tabs}</div>
+    ${ui.tab==="write"?viewWrite(n,l):ui.tab==="setting"?viewSetting(n,l):ui.tab==="world"?viewWorld(n,l):viewStyle()}`;
+}
+
+function viewWrite(n,l){
+  const cd = card(), f = ui.form, trial = cd.type==="trial", d = ui.draft && ui.draft.novelId===n.id ? ui.draft : null;
+  const busy = !!ui.gen;
+  const styleOpts = `<option value="">不使用</option>${cd.styles.map(s=>`<option value="${s.id}" ${f.style===s.id?"selected":""}>${esc(s.name)}</option>`).join("")}<option value="__new" ${f.style==="__new"?"selected":""}>新貼一段…</option>`;
+  const lens = [300,500,1000,2000,3000];
+  return `<div class="stack">
+    <p class="muted small">${n.lines.length>1?`正在 <b>${esc(l.name)}</b> 上續寫。`:""}已採納 ${l.chapters.length} 章；世界設定、人物檔案和已發生的事件會自動帶入。</p>
+    <label>這一章想寫什麼<textarea id="f-idea" rows="4" placeholder="例如：沈默半夜拆開那封信，信裡只有一張舊鐘樓的照片，背面寫著一個日期。">${esc(f.idea)}</textarea></label>
+    <details ${f.open?"open":""} id="f-details"><summary>更多設定（篇幅、文風、章節標題）</summary>
+      <div class="grid2" style="margin-top:10px">
+        <label>篇幅${trial?`<select disabled><option>體驗卡固定 500 字以內</option></select>`:`<select id="f-length">${lens.map(x=>`<option value="${x}" ${Number(f.length)===x?"selected":""}>約 ${fmt(x)} 字</option>`).join("")}</select>`}</label>
+        <label>文風參考<select id="f-style">${styleOpts}</select></label>
+        <label>章節標題（可選，採納時也能改）<input id="f-title" value="${esc(f.title)}" autocomplete="off"></label>
+      </div>
+      ${f.style==="__new"?`<div class="stack" style="margin-top:10px">
+        <label>參考片段<textarea id="f-newstyle" rows="4" placeholder="貼一段你喜歡的文字，會模仿它的語感">${esc(f.newStyle)}</textarea></label>
+        <div class="row"><label style="display:flex;gap:6px;align-items:center;color:var(--ink)"><input type="checkbox" id="f-savestyle" style="width:auto" ${f.saveStyle?"checked":""}>保存到文風片段</label>
+        <input id="f-newstylename" style="max-width:200px" placeholder="片段名稱" value="${esc(f.newStyleName)}"></div></div>`:""}
+      <label style="margin-top:10px">額外要求（可選）<textarea id="f-extra" rows="2" placeholder="例如：多寫對話，結尾留懸念">${esc(f.extra)}</textarea></label>
+    </details>
+    ${ui.formErr?`<p class="note err">${esc(ui.formErr)}</p>`:""}
+    <div class="row">
+      <button class="primary" data-act="gen" ${busy||!sample?"disabled":""}>${d&&d.status==="done"?"重新生成":"生成正文"}</button>
+      ${busy?`<button data-act="stop">停止</button>`:""}
+      <span class="muted small">${trial?`消耗 1 次體驗（剩 ${cd.trialLeft} 次）`:`按實際生成字數扣費，預計約 ${fmt(f.length)} 字`}${d&&d.status==="done"?"；重新生成會再次扣費":""}</span>
+    </div>
+    ${d?viewDraft(d):""}
+  </div>`;
+}
+
+function viewDraft(d){
+  if(d.status==="conflict") return `<div class="note warn stack"><b>這次的想法和已有設定有衝突，沒有生成正文，也沒有扣費。</b><div style="white-space:pre-wrap">${esc(d.text.replace(/^【設定衝突】/,""))}</div>
+    <div class="row"><button data-act="override">以這次的想法為準，繼續生成</button><span class="small">或者修改上面的想法後重新生成</span></div></div>`;
+  if(d.status==="blocked") return `<p class="note err">${esc(d.text.replace(/^【無法生成】/,"這個內容無法生成："))}（沒有扣費）</p>`;
+  const rw = ui.rewrite, streaming = d.status==="streaming";
+  return `<div class="panel stack" id="draft">
+    <div class="row" style="justify-content:space-between">
+      <span id="draft-status">${streaming?(d.text?`<span class="thinking">正在寫…</span>`:`<span class="thinking">正在構思…（第一次使用時需要你先允許）</span>`):d.status==="error"?"":"<b>生成結果</b>"}</span>
+      <span class="count num" id="draft-count">${fmt(count(d.text))} 字${d.msg&&d.status==="done"?` · ${esc(d.msg)}`:""}</span>
+    </div>
+    ${d.status==="error"?`<p class="note err">${esc(d.msg)}${d.text?" 下面是中斷前的部分，不能採納。":""}</p>`:""}
+    <textarea class="sheet" id="draft-text" readonly rows="14">${esc(d.text)}</textarea>
+    ${d.status==="done" && !rw ? `<div class="row">
+      <button class="primary" data-act="adopt">採納</button>
+      <button data-act="start-rewrite" ${d.trial&&d.rewriteLeft<=0?"disabled":""}>局部改寫</button>
+      <span class="muted small">${d.trial?(d.rewriteLeft>0?"選中一段文字後點「局部改寫」，體驗卡含 1 次改寫，改寫後全文不超過 500 字":"本次的改寫次數已用完"):"選中一段文字後點「局部改寫」"}</span>
+    </div>`:""}
+    ${rw?viewRewrite(rw,d):""}
+  </div>`;
+}
+
+function viewRewrite(rw,d){
+  const sel = d.text.slice(rw.start,rw.end);
+  const modes=[["less","減少修飾"],["dialog","調整對話"],["expand","擴寫"],["shrink","壓縮"],["custom","自定義"]];
+  return `<div class="stack" style="border-top:1px solid var(--line);padding-top:14px">
+    <h3>局部改寫</h3>
+    ${rw.status==="idle"||rw.status==="error"?`<div class="row">${modes.map(([k,t])=>`<button class="chip" data-act="rw-mode" data-mode="${k}" aria-pressed="${rw.mode===k}">${t}</button>`).join("")}</div>
+      ${rw.mode==="custom"?`<input id="rw-custom" placeholder="例如：把這段改成從林照的視角來寫" value="${esc(rw.custom)}" autocomplete="off">`:""}`:""}
+    <div class="compare">
+      <div><h3>原文 · ${fmt(count(sel))} 字</h3><div class="sheet sheet-read">${esc(sel)}</div></div>
+      <div><h3 id="rw-head">改寫後${rw.out?` · ${fmt(count(rw.out))} 字`:""}</h3><div class="sheet sheet-read" id="rw-out">${rw.status==="streaming"&&!rw.out?'<span class="thinking">正在改寫…</span>':esc(rw.out)}</div></div>
+    </div>
+    ${rw.err?`<p class="note err">${esc(rw.err)}</p>`:""}
+    ${rw.msg?`<p class="muted small">${esc(rw.msg)}</p>`:""}
+    <div class="row">
+      ${rw.status==="done"?`<button class="primary" data-act="rw-apply">替換原文</button><button data-act="rw-cancel">放棄改寫</button>`
+        :rw.status==="streaming"?`<button data-act="stop">停止</button>`
+        :`<button class="primary" data-act="rw-run" ${!rw.mode?"disabled":""}>開始改寫</button><button data-act="rw-cancel">取消</button>`}
+    </div></div>`;
+}
+
+function viewSetting(n,l){
+  const chars = n.chars.map(c=>{
+    const log=[]; l.chapters.forEach((ch,i)=>(ch.records?.chars||[]).filter(x=>x.name===c.name).forEach(x=>log.push(`<div><span class="muted">第${CN(i+1)}章</span> ${esc(x.change)}</div>`)));
+    return `<div class="char" data-char="${c.id}">
+      <div class="grid2">
+        <label>名字<input data-cf="name" value="${esc(c.name)}"></label>
+        <label>性格傾向<input data-cf="personality" value="${esc(c.personality)}" placeholder="平時的樣子，可以被劇情改變"></label>
+      </div>
+      <label>行為底線<input data-cf="bottomLine" value="${esc(c.bottomLine)}" placeholder="無論劇情怎麼發展都不會做的事"></label>
+      <label>其他（年齡、身份、外貌等）<input data-cf="notes" value="${esc(c.notes)}"></label>
+      <div class="char-log"><span class="eyebrow">經歷與關係變化${n.lines.length>1?`（${esc(l.name)}）`:""}</span>${log.join("")||'<span class="muted">採納章節後自動記錄</span>'}</div>
+      <div><button class="danger small" data-act="del-char" data-id="${c.id}">刪除人物</button></div>
+    </div>`;}).join("");
+  return `<div class="stack">
+    <p class="muted small">這裡填寫的內容生成時一定會遵守；沒填的部分允許自由發揮。修改會自動保存。</p>
+    <label>世界設定<textarea id="s-world" rows="4" placeholder="時代、地點、社會規則……">${esc(n.base.world)}</textarea></label>
+    <label>必須遵守的規則<textarea id="s-rules" rows="3" placeholder="例如：沒有超自然力量；主角不會死">${esc(n.base.rules)}</textarea></label>
+    <div class="row" style="justify-content:space-between;margin-top:8px"><h2>人物檔案</h2><button data-act="add-char">＋ 添加人物</button></div>
+    ${chars||'<p class="muted">還沒有人物。採納章節時，新出場的人物也可以自動加入。</p>'}
+    <div style="border-top:1px solid var(--line);padding-top:16px;margin-top:10px">
+      ${ui.confirmNovel?confirmBox(`刪除《${n.title}》及其所有世界線和章節，無法恢復。`,"do-del-novel","cancel-confirm")
+        :`<button class="danger" data-act="del-novel">刪除這部作品</button>`}
+    </div>
+  </div>`;
+}
+
+function viewWorld(n,l){
+  const lines = n.lines.length>1 ? `<div class="row">${n.lines.map(x=>`<button class="chip" data-act="switch-line" data-id="${x.id}" aria-pressed="${x.id===l.id}">${esc(x.name)} · ${x.chapters.length} 章</button>`).join("")}</div>` : "";
+  const chs = l.chapters.map((c,i)=>`<button class="chap" data-act="open-chap" data-id="${c.id}" aria-current="${c.id===ui.chapId}"><span class="idx">${i+1}</span><span class="t">${esc(c.title)}</span><span class="count num">${fmt(count(c.text))} 字${c.versions.length?` · ${c.versions.length} 個舊版本`:""}</span></button>`).join("");
+  const idx = l.chapters.findIndex(c=>c.id===ui.chapId), ch = l.chapters[idx];
+  const canExport = !!downloads;
+  return `<div class="stack">
+    ${lines}
+    <div class="row" style="justify-content:space-between">
+      <span class="muted small">${n.lines.length>1?"切換世界線後，寫作會在選中的世界線上繼續。":"改變劇情或設定的修改會建立新分支，原世界線保留。"}</span>
+      <span class="row">${canExport?`<button data-act="export" data-kind="txt">導出 TXT</button><button data-act="export" data-kind="docx">導出 Word</button>`:`<span class="muted small">在 Claude 裡打開才能導出</span>`}</span>
+    </div>
+    ${ui.exportMsg?`<p class="note err">${esc(ui.exportMsg)}</p>`:""}
+    ${chs?`<div class="chapters">${chs}</div>`:`<div class="empty"><p>這條世界線還沒有章節。</p><button data-act="tab" data-tab="write">去寫第一章</button></div>`}
+    ${ch?viewChapter(n,l,ch,idx):""}
+  </div>`;
+}
+
+function viewChapter(n,l,ch,idx){
+  const r = ch.records||{settings:[],events:[],chars:[]};
+  if(ui.editing && ui.editing.chapId===ch.id){
+    const e = ui.editing;
+    return `<div class="panel stack">
+      <h2>修改 ${esc(ch.title)}</h2>
+      <textarea class="sheet" id="edit-text" rows="14">${esc(e.text)}</textarea>
+      <div class="stack small">
+        <label style="display:flex;gap:8px;color:var(--ink)"><input type="radio" name="edit-mode" value="polish" style="width:auto" ${e.mode==="polish"?"checked":""}><span><b>只是潤色</b><br><span class="muted">劇情和設定不變，保存為新版本，舊版本保留可查看</span></span></label>
+        <label style="display:flex;gap:8px;color:var(--ink)"><input type="radio" name="edit-mode" value="plot" style="width:auto" ${e.mode==="plot"?"checked":""}><span><b>改變了劇情或設定</b><br><span class="muted">從這一章建立新分支，重新提取設定和事件；「${esc(l.name)}」原樣保留${idx<l.chapters.length-1?`，第${idx+2}章之後的內容不會帶到新分支`:""}</span></span></label>
+      </div>
+      <div class="row"><button class="primary" data-act="save-edit">保存修改</button><button data-act="cancel-edit">取消</button></div>
+    </div>`;
+  }
+  const list = (t,a)=>a&&a.length?`<div><span class="eyebrow">${t}</span><ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
+  return `<div class="panel stack">
+    <div class="row" style="justify-content:space-between"><h2>${esc(ch.title)}</h2><span class="row"><button data-act="edit-chap">修改</button><button data-act="reextract">重新提取記錄</button></span></div>
+    <div class="sheet sheet-read">${esc(ch.text)}</div>
+    <div class="records">
+      ${list("新增設定",r.settings)}${list("事件",r.events)}${list("人物變化",(r.chars||[]).map(c=>`${c.name}：${c.change}`))}
+      ${!(r.settings?.length||r.events?.length||r.chars?.length)?'<span class="muted">這一章沒有記錄。可以點「重新提取記錄」。</span>':""}
+    </div>
+    ${ch.versions.length?`<details><summary>舊版本（${ch.versions.length}）</summary><div class="stack" style="margin-top:8px">${ch.versions.map((v,i)=>`<div class="stack"><div class="row" style="justify-content:space-between"><span class="muted small">${new Date(v.at).toLocaleString("zh-TW")} 之前的版本</span><button class="small" data-act="restore" data-i="${i}">恢復這個版本</button></div><div class="sheet sheet-read" style="max-height:220px;overflow:auto">${esc(v.text)}</div></div>`).join("")}</div></details>`:""}
+  </div>`;
+}
+
+function viewStyle(){
+  const cd = card();
+  return `<div class="stack">
+    <p class="muted small">保存常用的參考片段，寫作時可以直接選用，也可以每次重新貼。片段屬於你的卡密，所有作品共用。</p>
+    ${cd.styles.map(s=>`<div class="char"><div class="row" style="justify-content:space-between"><h3>${esc(s.name)}</h3><button class="danger small" data-act="del-style" data-id="${s.id}">刪除</button></div><div class="sheet sheet-read">${esc(s.text)}</div></div>`).join("")||'<p class="muted">還沒有保存片段。</p>'}
+    <form id="new-style" class="panel stack"><h3>添加片段</h3>
+      <label>名稱<input id="ns-name" autocomplete="off" placeholder="例如：冷淡白描"></label>
+      <label>片段內容<textarea id="ns-text" rows="4"></textarea></label>
+      <div><button class="primary" type="submit">保存</button></div></form>
+  </div>`;
+}
+
+/* ---------- live paint during streaming ---------- */
+function paintDraft(){
+  const t = document.getElementById("draft-text"); if(!t) return;
+  t.value = ui.draft.text; t.scrollTop = t.scrollHeight;
+  const c = document.getElementById("draft-count"); if(c) c.textContent = `${fmt(count(ui.draft.text))} 字`;
+  const s = document.getElementById("draft-status"); if(s && ui.draft.text) s.innerHTML = '<span class="thinking">正在寫…</span>';
+}
+function paintRewrite(){
+  const o = document.getElementById("rw-out"); if(o) o.textContent = ui.rewrite.out;
+  const h = document.getElementById("rw-head"); if(h) h.textContent = `改寫後 · ${fmt(count(ui.rewrite.out))} 字`;
+}
+
+/* ---------- modal ---------- */
+function renderModal(){
+  const host = document.getElementById("modal-host");
+  if(!ui.modal){ host.innerHTML=""; return; }
+  const m = ui.modal.m, isDraft = m.target.kind==="draft";
+  const group = (g,title,items,fmtItem) => items.length?`<div class="stack"><span class="eyebrow">${title}</span><div class="checks">${items.map((x,i)=>`<label><input type="checkbox" checked data-g="${g}" data-i="${i}"><span>${fmtItem(x)}</span></label>`).join("")}</div></div>`:"";
+  let body;
+  if(m.status==="loading") body = `<p class="thinking">正在從正文中提取新增設定和事件…</p>`;
+  else if(m.status==="error") body = `<p class="note err">提取失敗：${esc(m.err)}</p><p class="small muted">${isDraft?"你仍然可以只採納正文，不帶記錄。":""}</p>`;
+  else { const d=m.data; body = (group("settings","新增設定",d.settings,esc)+group("events","事件",d.events,esc)+group("chars","人物變化",d.chars,c=>`<b>${esc(c.name)}</b>：${esc(c.change)}`)+group("newChars","新出場人物（加入人物檔案）",d.newChars,c=>`<b>${esc(c.name)}</b>　${esc(c.personality)}${c.bottomLine?`；底線：${esc(c.bottomLine)}`:""}`))
+      || `<p class="muted">沒有提取到新的設定或事件。</p>`;
+    body = `<p class="small muted">取消勾選你不認可的條目。確認後，${isDraft?"正文和勾選的記錄會一起進入世界線":"勾選的記錄會替換這一章原來的記錄"}。</p>${body}`; }
+  host.innerHTML = `<div class="scrim"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt">
+    <h2 id="mt">${isDraft?"採納到世界線":"更新章節記錄"}</h2>
+    <label>章節標題<input id="adopt-title" value="${esc(m.title)}" autocomplete="off"></label>
+    ${body}
+    <div class="row"><button class="primary" data-act="adopt-ok" ${m.status==="loading"?"disabled":""}>${isDraft?"確認採納":"確認"}</button><button data-act="adopt-cancel">取消</button></div>
+  </div></div>`;
+}
+
+/* ---------- events ---------- */
+ui.form = {idea:"",extra:"",length:1000,style:"",newStyle:"",newStyleName:"",saveStyle:true,title:"",open:false};
+function resetNovelUI(){ ui.draft=null; ui.rewrite=null; ui.chapId=null; ui.editing=null; ui.confirmNovel=false; ui.exportMsg=""; ui.formErr="";
+  ui.form = {idea:"",extra:"",length:1000,style:"",newStyle:"",newStyleName:"",saveStyle:true,title:"",open:false}; }
+
+const acts = {
+  "to-admin":()=>{ ui.admin=true; ui.adminMsg=""; },
+  "back-login":()=>{ ui.admin=false; ui.adminAuthed=false; ui.adminMsg=""; ui.confirmCard=null; },
+  "logout":()=>{ S.session=null; save(); ui.view="login"; ui.novelId=null; resetNovelUI(); ui.gen?.abort(); },
+  "set-bal":b=>adjust(b.dataset.key,"set"), "add-bal":b=>adjust(b.dataset.key,"add"),
+  "trial-reset":b=>{ S.cards[b.dataset.key].trialLeft=3; save(); ui.adminMsg=`${b.dataset.key} 已重置為 3 次`; },
+  "del-card":b=>{ ui.confirmCard=b.dataset.key; },
+  "do-del-card":()=>{ delete S.cards[ui.confirmCard]; if(S.session===ui.confirmCard) S.session=null; ui.adminMsg=`已刪除 ${ui.confirmCard}`; ui.confirmCard=null; save(); },
+  "cancel-confirm":()=>{ ui.confirmCard=null; ui.confirmNovel=false; },
+  "new-novel":()=>{ ui.newNovel=true; }, "cancel-new":()=>{ ui.newNovel=false; },
+  "open-novel":b=>{ if(ui.gen) return; ui.novelId=b.dataset.id; ui.tab="write"; resetNovelUI(); },
+  "tab":b=>{ ui.tab=b.dataset.tab; ui.confirmNovel=false; },
+  "gen":()=>generate(false), "override":()=>generate(true),
+  "stop":()=>ui.gen?.abort(),
+  "adopt":()=>openAdopt({kind:"draft"}),
+  "adopt-ok":()=>commitAdopt(), "adopt-cancel":()=>{ ui.modal=null; renderModal(); return "skip"; },
+  "start-rewrite":()=>{ const t=document.getElementById("draft-text"); const s=t.selectionStart, e=t.selectionEnd;
+    if(e-s<2){ ui.draft.msg2=""; flash("先在正文裡選中要改的一段文字。"); return "skip"; }
+    ui.rewrite={start:s,end:e,mode:"",custom:"",out:"",status:"idle",err:"",msg:""}; },
+  "rw-mode":b=>{ ui.rewrite.mode=b.dataset.mode; ui.rewrite.err=""; },
+  "rw-run":()=>{ const c=document.getElementById("rw-custom"); if(c) ui.rewrite.custom=c.value; runRewrite(); return "skip"; },
+  "rw-apply":()=>{ const d=ui.draft, rw=ui.rewrite; d.text=d.text.slice(0,rw.start)+rw.out+d.text.slice(rw.end); ui.rewrite=null; },
+  "rw-cancel":()=>{ ui.rewrite=null; },
+  "add-char":()=>{ novel().chars.push({id:uid(),name:"新人物",personality:"",bottomLine:"",notes:""}); save(); },
+  "del-char":b=>{ const n=novel(); n.chars=n.chars.filter(c=>c.id!==b.dataset.id); save(); },
+  "del-novel":()=>{ ui.confirmNovel=true; },
+  "do-del-novel":()=>{ const cd=card(); cd.novels=cd.novels.filter(x=>x.id!==ui.novelId); ui.novelId=null; resetNovelUI(); save(); },
+  "switch-line":b=>{ novel().currentLine=b.dataset.id; ui.chapId=null; ui.editing=null; save(); },
+  "open-chap":b=>{ ui.chapId = ui.chapId===b.dataset.id?null:b.dataset.id; ui.editing=null; },
+  "edit-chap":()=>{ const ch=line().chapters.find(c=>c.id===ui.chapId); ui.editing={chapId:ch.id,text:ch.text,mode:"polish"}; },
+  "cancel-edit":()=>{ ui.editing=null; },
+  "save-edit":()=>saveEdit(),
+  "reextract":()=>{ if(!sample){ flash("需要在 Claude 裡打開才能提取。"); return "skip"; } openAdopt({kind:"chapter",lineId:line().id,chapId:ui.chapId}); return "skip"; },
+  "restore":b=>{ const ch=line().chapters.find(c=>c.id===ui.chapId); const v=ch.versions[Number(b.dataset.i)];
+    ch.versions.push({text:ch.text,at:Date.now()}); ch.text=v.text; ch.versions.splice(Number(b.dataset.i),1); save(); },
+  "export":b=>{ doExport(b.dataset.kind); return "skip"; },
+  "del-style":b=>{ const cd=card(); cd.styles=cd.styles.filter(s=>s.id!==b.dataset.id); if(ui.form.style===b.dataset.id) ui.form.style=""; save(); },
+};
+function adjust(key,how){ const v=Number(document.getElementById("adj-"+key)?.value); if(!Number.isFinite(v)||v<0||document.getElementById("adj-"+key).value===""){ ui.adminMsg="請輸入字數。"; return; }
+  const c=S.cards[key]; c.balance = how==="set"?Math.round(v):c.balance+Math.round(v); save(); ui.adminMsg=`${key} 餘額現在是 ${fmt(c.balance)} 字`; }
+function saveEdit(){
+  const n=novel(), l=line(n), e=ui.editing, idx=l.chapters.findIndex(c=>c.id===e.chapId), ch=l.chapters[idx];
+  e.text = document.getElementById("edit-text").value; e.mode = document.querySelector('input[name="edit-mode"]:checked')?.value||"polish";
+  if(e.text===ch.text){ ui.editing=null; return; }
+  if(e.mode==="polish"){ ch.versions.push({text:ch.text,at:Date.now()}); ch.text=e.text; ui.editing=null; save(); return; }
+  const branchNo = n.lines.filter(x=>x.parent).length+1;
+  const nl = {id:uid(),name:`分支 ${branchNo}`,parent:l.id,from:idx,chapters:clone(l.chapters.slice(0,idx+1))};
+  const last = nl.chapters[idx]; last.id=uid(); last.versions.push({text:last.text,at:Date.now()}); last.text=e.text; last.records={settings:[],events:[],chars:[]};
+  nl.chapters.forEach((c,i)=>{ if(i<idx) c.id=uid(); });
+  n.lines.push(nl); n.currentLine=nl.id; ui.chapId=last.id; ui.editing=null; save(); render();
+  if(sample) openAdopt({kind:"chapter",lineId:nl.id,chapId:last.id});
+  return "skip";
+}
+let flashTimer;
+function flash(msg){ const s=document.getElementById("draft-status")||document.querySelector(".tabs"); if(!s) return;
+  let el=document.getElementById("flash"); if(!el){ el=document.createElement("p"); el.id="flash"; el.className="note warn"; s.closest(".panel, .stack")?.prepend(el); }
+  el.textContent=msg; clearTimeout(flashTimer); flashTimer=setTimeout(()=>el.remove(),3500); }
+
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-act]"); if(!b || b.disabled) return;
+  const f = acts[b.dataset.act]; if(!f) return;
+  e.preventDefault();
+  const r = f(b); if(r!=="skip"){ render(); if(b.dataset.act==="adopt-ok") return; }
+});
+document.addEventListener("submit", e=>{
+  e.preventDefault(); const id=e.target.id;
+  if(id==="login-form"){ const k=document.getElementById("card-key").value.trim().toUpperCase();
+    const hit = Object.keys(S.cards).find(x=>x.toUpperCase()===k);
+    if(!hit){ ui.loginErr="卡密不存在，請檢查是否輸入正確。"; render(); return; }
+    S.session=hit; save(); ui.view="app"; ui.loginErr=""; ui.novelId=card().novels[0]?.id||null; resetNovelUI(); render(); }
+  if(id==="admin-login"){ if(document.getElementById("admin-pwd").value===S.adminPwd){ ui.adminAuthed=true; ui.adminMsg=""; } else ui.adminMsg="密碼不正確。"; render(); }
+  if(id==="new-card"){ const type=document.getElementById("nc-type").value; const bal=Math.max(0,Math.round(Number(document.getElementById("nc-bal").value)||0));
+    let key=document.getElementById("nc-key").value.trim().toUpperCase();
+    if(!key){ const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; const g=()=>Array.from({length:4},()=>A[Math.floor(Math.random()*A.length)]).join(""); do{ key=g()+"-"+g(); }while(S.cards[key]); }
+    if(S.cards[key]){ ui.adminMsg=`${key} 已經存在。`; render(); return; }
+    S.cards[key]=newCard(key,type,bal); save(); ui.adminMsg=`已生成 ${key}（${type==="trial"?"體驗卡 3 次":fmt(bal)+" 字"}）`; render(); }
+  if(id==="new-novel"){ const t=document.getElementById("nn-title").value.trim(); if(!t) return;
+    const n=newNovel(t); card().novels.unshift(n); ui.novelId=n.id; ui.newNovel=false; resetNovelUI(); ui.tab="setting"; save(); render(); }
+  if(id==="new-style"){ const name=document.getElementById("ns-name").value.trim(), text=document.getElementById("ns-text").value.trim();
+    if(!text) return; card().styles.push({id:uid(),name:name||`片段 ${card().styles.length+1}`,text}); save(); render(); }
+});
+document.addEventListener("input", e=>{
+  const t=e.target, f=ui.form, n=novel();
+  const map = {"f-idea":"idea","f-extra":"extra","f-title":"title","f-newstyle":"newStyle","f-newstylename":"newStyleName"};
+  if(map[t.id]) f[map[t.id]]=t.value;
+  if(t.id==="rw-custom") ui.rewrite.custom=t.value;
+  if(t.id==="s-world"){ n.base.world=t.value; save(); }
+  if(t.id==="s-rules"){ n.base.rules=t.value; save(); }
+  if(t.dataset.cf){ const c=n.chars.find(x=>x.id===t.closest("[data-char]").dataset.char); const old=c.name; c[t.dataset.cf]=t.value;
+    if(t.dataset.cf==="name") n.lines.forEach(l=>l.chapters.forEach(ch=>(ch.records?.chars||[]).forEach(x=>{ if(x.name===old) x.name=t.value; })));
+    save(); }
+  if(t.id==="edit-text" && ui.editing) ui.editing.text=t.value;
+});
+document.addEventListener("change", e=>{
+  const t=e.target, f=ui.form;
+  if(t.id==="f-length") f.length=Number(t.value);
+  if(t.id==="f-style"){ f.style=t.value; render(); }
+  if(t.id==="f-savestyle") f.saveStyle=t.checked;
+  if(t.name==="edit-mode" && ui.editing){ ui.editing.mode=t.value; ui.editing.text=document.getElementById("edit-text").value; render(); }
+});
+document.addEventListener("toggle", e=>{ if(e.target.id==="f-details") ui.form.open=e.target.open; }, true);
+
+function afterRender(){ const t=document.getElementById("draft-text"); if(t && ui.draft?.status==="streaming") t.scrollTop=t.scrollHeight; }
+
+if(ui.view==="app" && !ui.novelId) ui.novelId = card()?.novels[0]?.id || null;
+render();
+})();
+</script>
+
+</body></html>

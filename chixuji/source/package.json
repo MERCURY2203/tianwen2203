@@ -1,0 +1,12 @@
+{
+  "name": "xiaoshouji",
+  "version": "0.1.0",
+  "private": true,
+  "description": "人机恋迟叙机 — 第 1 阶段",
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning server/main.mjs",
+    "test": "node --no-warnings=ExperimentalWarning --test --test-concurrency=1 server/test/*.test.mjs",
+    "build": "node web/build.mjs"
+  },
+  "engines": { "node": ">=22.13" }
+}

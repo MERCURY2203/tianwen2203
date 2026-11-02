@@ -1,0 +1,1863 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>飞翔羽毛球馆订场</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 上方切换：客户端（手机框）/ 管理后台（电脑宽屏）。球场绿为主色 */
+:root{--bg:#eef2ee;--card:#fff;--fg:#1d2a22;--muted:#66756b;--line:#d9e2db;--accent:#1f8a4c;--accent-soft:#dff2e6;--taken:#cfd6d1;--lock:#d9a441;--danger:#c0392b;--side:#f6f8f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--card:#1b231e;--fg:#e4ece6;--muted:#93a399;--line:#2c3830;--accent:#3cb871;--accent-soft:#1f3a2a;--taken:#38433c;--lock:#a07a2c;--danger:#e2675a;--side:#161e19;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121815;--card:#1b231e;--fg:#e4ece6;--muted:#93a399;--line:#2c3830;--accent:#3cb871;--accent-soft:#1f3a2a;--taken:#38433c;--lock:#a07a2c;--danger:#e2675a;--side:#161e19;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.switch{display:flex;gap:4px;max-width:420px;margin:0 auto 6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px}
+.switch button{flex:1;border:0;background:none;padding:8px;border-radius:7px;color:var(--muted);cursor:pointer;font-size:13px}
+.switch button.on{background:var(--accent);color:#fff}
+.note{font-size:12px;color:var(--muted);text-align:center;margin:0 0 12px}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{border:0;border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer;background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn.red{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.sm{padding:4px 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.lnk{border:0;background:none;color:var(--accent);padding:0;cursor:pointer;font-size:inherit}
+.muted{color:var(--muted);font-size:12px}
+.pill{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.off{background:var(--taken);color:var(--muted)}
+.pill.warn{background:var(--lock);color:#fff}
+select,input{font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg);font-family:inherit}
+h3{margin:0;font-size:15px}
+/* 手机 */
+.phone{width:100%;max-width:420px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;height:760px;max-height:calc(100vh - 60px);min-height:520px}
+.phone>*{flex:none}
+.top{background:var(--accent);color:#fff;padding:14px 16px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.top small{font-weight:400;opacity:.85;font-size:12px}
+.phone>.pmain,.phone>.gate{flex:1 1 0;min-height:0;overflow-y:auto}
+.pmain{padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.pmain>*{flex:none}
+.tabs{display:flex;border-top:1px solid var(--line)}
+.tabs button{flex:1;padding:12px 0;border:0;background:none;color:var(--muted);font-size:13px;cursor:pointer}
+.tabs button.on{color:var(--accent);font-weight:600}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.days button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:6px 9px;font-size:12px;cursor:pointer;line-height:1.4}
+.days button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.days em{font-style:normal;font-size:10px;opacity:.75;display:block}
+.grid-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.grid th,.grid td{border:1px solid var(--line);text-align:center;padding:0}
+.grid th{background:var(--side);color:var(--muted);font-weight:500;padding:4px 6px;white-space:nowrap}
+.grid tr>th:first-child{position:sticky;left:0;z-index:1}
+.grid td button{width:40px;height:30px;border:0;background:transparent;color:var(--fg);font-size:11px;cursor:pointer}
+.grid td button.taken{background:var(--taken);color:var(--muted)}
+.grid td button.past{background:var(--taken);color:var(--muted);opacity:.5;cursor:not-allowed}
+.grid td button.lock{background:var(--lock);color:#fff}
+.grid td button.sel{background:var(--accent);color:#fff}
+.bn{position:relative;margin:-14px -14px 0;aspect-ratio:16/9;max-width:none;overflow:hidden;background:var(--taken);touch-action:pan-y;cursor:grab;user-select:none}
+.bn-track{display:flex;height:100%;transition:transform .5s ease}
+.bn-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
+.bn-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+.bn-dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.55);transition:width .3s}
+.bn-dots i.on{background:#fff;width:16px}
+.bn-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;display:block}
+@media (prefers-reduced-motion:reduce){.bn-track{transition:none}}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;border:1px solid var(--line)}
+.bar{display:flex;justify-content:space-between;align-items:center;background:var(--accent-soft);border-radius:10px;padding:10px 12px;gap:10px;position:sticky;bottom:0;z-index:3;border:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.12)}
+.item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.gate{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:24px 20px;text-align:center}
+.logo-img{display:block;width:78%;max-width:300px;margin:0 auto;background:#fff;border-radius:12px;padding:6px}
+.chk{font-size:13px;display:flex;gap:6px;align-items:flex-start;text-align:left;line-height:1.6}
+.menu{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.menu button{display:flex;justify-content:space-between;border:0;border-bottom:1px solid var(--line);background:var(--card);color:var(--fg);padding:13px 14px;font-size:14px;cursor:pointer;text-align:left}
+.menu button:last-child{border-bottom:0}
+.menu button.danger{color:var(--danger)}
+/* 后台 */
+.admin{max-width:1100px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:190px 1fr;min-height:620px}
+.side{background:var(--side);border-right:1px solid var(--line);padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.side .brand{font-weight:700;padding:0 8px 4px;color:var(--accent)}
+.side .whoami{font-size:12px;color:var(--muted);padding:0 8px 12px}
+.side button{border:0;background:none;text-align:left;padding:9px 10px;border-radius:7px;color:var(--fg);cursor:pointer;font-size:13px}
+.side button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.amain{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+.tbl{width:100%;font-size:13px}
+.tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.tbl th{background:var(--side);color:var(--muted);font-weight:500}
+.tbl tr:last-child td{border-bottom:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--side);border:1px solid var(--line);border-radius:10px;padding:12px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums;margin-top:4px}
+.form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.box{border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.hbar{display:grid;grid-template-columns:64px 1fr 40px;gap:8px;align-items:center;font-size:12px;font-variant-numeric:tabular-nums}
+.hbar div{height:10px;background:var(--accent);border-radius:3px;min-width:2px}
+.login{max-width:360px;margin:40px auto;display:flex;flex-direction:column;gap:12px;padding:0 16px}
+.login label{display:flex;flex-direction:column;gap:4px;font-size:13px}
+@media (max-width:720px){.admin{grid-template-columns:1fr}.side{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--line)}.side .brand,.side .whoami{width:100%}}
+/* 弹层 */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet>div{background:var(--card);width:100%;max-width:440px;max-height:82vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.doc{font-size:13px;line-height:1.75}
+.doc h4{margin:12px 0 2px;font-size:14px}
+.doc p{margin:2px 0}
+[hidden]{display:none!important}
+.anavbar{flex:none;display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.anavbar b{font-size:17px;color:var(--accent)}.anavbar .muted{flex:1;min-width:0}
+.anavbar button{border:0;background:var(--side);color:var(--fg);border-radius:99px;padding:7px 14px;font-size:14px;cursor:pointer;white-space:nowrap}
+.anavbar button i{display:inline-block;font-style:normal;margin-left:4px;transition:transform .2s}.anavbar button.open i{transform:rotate(180deg)}
+.anav{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.anav button{height:42px;border:0;border-radius:8px;background:var(--side);color:var(--fg);font-size:15px;font-weight:500;cursor:pointer;white-space:nowrap;overflow:hidden;padding:0 2px}
+.anav button.on{background:var(--accent);color:#fff;font-weight:600}
+.pcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--card);text-align:left;padding:0;color:var(--fg);font:inherit;display:block;width:100%}
+.pcard img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--taken)}
+.pcard.out img{opacity:.5}
+.pinfo{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;padding:10px 12px 12px}
+.pinfo .nm{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinfo>div:first-child{min-width:0}
+.price{color:var(--danger);font-weight:700;white-space:nowrap;font-size:13px}.price b{font-size:20px}
+.ptag{position:relative}.ptag span{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:2px 8px;border-radius:6px}
+.pd-cover{margin:-14px -14px 0;width:calc(100% + 28px);max-width:none;aspect-ratio:16/9;object-fit:cover;display:block}
+.pd-img{width:calc(100% + 28px);max-width:none;margin:0 -14px;display:block}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.stepper button{width:32px;height:30px;border:0;background:var(--side);color:var(--fg);font-size:16px;cursor:pointer}
+.stepper button:disabled{color:var(--muted);cursor:not-allowed}
+.stepper span{width:34px;text-align:center;font-variant-numeric:tabular-nums}
+.seg{display:flex;background:var(--side);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{flex:1;border:0;background:none;padding:7px;border-radius:7px;color:var(--muted);cursor:pointer;font-size:13px}
+.seg button.on{background:var(--card);color:var(--accent);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.vch{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--accent);background:var(--accent-soft);border-radius:8px;padding:8px 10px;gap:8px}
+.vch.off{border-color:var(--line);background:var(--side)}
+.vch .code{font-size:20px;font-weight:700;letter-spacing:3px;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.vch.off .code{color:var(--muted);text-decoration:line-through}
+.vch .lk{border:0;background:none;padding:0;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.qrwrap{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.qr{background:#fff;border-radius:8px;max-width:100%}
+.bigcode{font-size:28px;font-weight:700;letter-spacing:6px;font-family:ui-monospace,Menlo,monospace}
+.scanbtn{width:100%;padding:16px;font-size:16px}
+.vinfo{border-width:2px}.vinfo.good{border-color:var(--accent)}.vinfo.bad{border-color:var(--danger)}
+.thumbrow{display:flex;gap:10px}.thumbrow img{width:112px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;flex:none}
+.thumbrow>div{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.ef{display:flex;flex-direction:column;gap:4px;font-size:13px}.ef input,.ef textarea{width:100%;box-sizing:border-box}
+.ef textarea{min-height:70px;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg);font-family:inherit}
+.imgs{display:flex;flex-direction:column;gap:8px}.imgs img{width:100%;border-radius:6px;display:block}
+.bn img{cursor:pointer}
+.toast{position:fixed;left:50%;top:40%;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:30}
+</style>
+
+<p class="note">示例：数据为假，刷新会清空。管理员入口在“我的”页面最下方。</p>
+<div id="app"></div>
+<div id="sheet" class="sheet" hidden><div id="sheetBody"></div></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* QR code generator: qrcode-terminal vendor (Apache-2.0, based on Kazuhiko Arase's QRCode for JavaScript, MIT) */
+var QRLIB=(function(){var M={};function R(n){return M[n.replace("./","")]}
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+M["QRMode"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+M["QRMath"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+M["QRPolynomial"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+M["QRErrorCorrectLevel"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+
+
+
+
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+M["QRRSBlock"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+M["QRBitBuffer"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+M["QRMaskPattern"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+M["QRUtil"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+M["QR8bitByte"]=module.exports;})();
+(function(){var module={exports:{}};var exports=module.exports;var require=R;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+M["index"]=module.exports;})();
+return {QRCode:M.index,L:M.QRErrorCorrectLevel};})();
+function qrSVG(text,size){var q=new QRLIB.QRCode(-1,QRLIB.L.M);q.addData(text);q.make();var n=q.getModuleCount(),p=2,t=n+p*2,d="";for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(q.isDark(r,c))d+="M"+(c+p)+" "+(r+p)+"h1v1h-1z";return '<svg class="qr" viewBox="0 0 '+t+' '+t+'" width="'+size+'" height="'+size+'" shape-rendering="crispEdges" role="img" aria-label="核销二维码"><rect width="'+t+'" height="'+t+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>'}
+</script>
+<script>
+/* ---------- 北京时间工具（不受设备时区影响） ---------- */
+const BJ=8*36e5, COURTS=10, VENUE='飞翔羽毛球馆', CO='广州羽美体育发展有限公司', CONTACT='唐先生 138 0000 0000';
+const pad=n=>String(n).padStart(2,'0');
+const bj=()=>new Date(Date.now()+BJ);
+const dstr=d=>`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`;
+const TODAY=()=>dstr(bj());
+const nowText=()=>{const d=bj();return `${dstr(d)} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`};
+const addD=(s,n)=>{const d=new Date(s+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return dstr(d)};
+const dow=s=>new Date(s+'T00:00:00Z').getUTCDay();
+const md=s=>`${+s.slice(5,7)}月${+s.slice(8)}日`;
+const WK='日一二三四五六';
+const startMs=(s,h)=>Date.parse(`${s}T${pad(h)}:00:00Z`)-BJ;
+const days7=()=>[...Array(7)].map((_,i)=>addD(TODAY(),i));
+const fmtPhone=p=>p?`${p.slice(0,3)} ${p.slice(3,7)} ${p.slice(7)}`:'已注销';
+const maskPhone=p=>p?`${p.slice(0,3)} **** ${p.slice(7)}`:'已注销';
+
+/* ---------- 数据 ---------- */
+const settings={open:9,close:23};
+const hol=new Set(), work=new Set();           // 手动标记的节假日 / 调休上班日
+const isHol=s=>hol.has(s)||(dow(s)%6===0&&!work.has(s));
+let rules=[{from:'2026-01-01',weekday:65,holiday:100,by:'系统初始',at:'2026-10-25 01:18'}];
+function ruleFor(s){let r=null;rules.forEach(x=>{if(x.from<=s&&(!r||x.from>=r.from))r=x});return r}
+const price=s=>{const r=ruleFor(s);return isHol(s)?r.holiday:r.weekday};
+let banners=[];
+function sampleBanner(t1,t2,c1,c2){const c=document.createElement('canvas');c.width=1280;c.height=720;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,1280,720);gr.addColorStop(0,c1);gr.addColorStop(1,c2);g.fillStyle=gr;g.fillRect(0,0,1280,720);g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.arc(1080,140,260,0,7);g.fill();g.fillStyle='#fff';g.font='bold 92px sans-serif';g.fillText(t1,80,330);g.font='48px sans-serif';g.fillText(t2,84,430);g.font='32px sans-serif';g.globalAlpha=.75;g.fillText('示例广告图 · 老板可在后台更换',84,640);return c.toDataURL('image/jpeg',.8)}
+function sampleDetail(lines,c){const k=document.createElement('canvas');k.width=1080;k.height=720;const g=k.getContext('2d');g.fillStyle=c;g.fillRect(0,0,1080,720);g.fillStyle='#fff';g.font='bold 64px sans-serif';g.fillText(lines[0],70,150);g.font='42px sans-serif';lines.slice(1).forEach((t,i)=>g.fillText(t,70,260+i*80));return k.toDataURL('image/jpeg',.8)}
+let products=[];
+try{
+  products=[
+    {id:'P1',name:'周六双打积分赛报名',price:88,stock:32,left:30,sold:2,used:0,validUntil:addD(TODAY(),5),active:true,cover:sampleBanner('周六双打积分赛','报名费 ¥88/人 · 限32人','#1f4fa8','#5b8ff0'),images:[sampleDetail(['比赛安排','时间：本周六 14:00','地点：飞翔羽毛球馆 1-8号场','赛制：双打循环赛 + 淘汰赛'],'#244f9e'),sampleDetail(['报名须知','每份为1人名额','到场出示核销码签到','比赛前未核销可随时退款'],'#2f6bd1')],desc:'冠军奖品：专业球拍一支。名额有限，先到先得。'},
+    {id:'P2',name:'畅打10次卡',price:550,stock:null,left:null,sold:0,used:0,validUntil:'',active:true,cover:sampleBanner('畅打10次卡','¥550 · 平均每次只要55元','#1f8a4c','#45b878'),images:[sampleDetail(['使用说明','每次到店核销1次','长期有效，不限时段','一次可买多张'],'#1f8a4c')],desc:''}
+  ];
+  banners=[{src:sampleBanner('新客首单立减10元','飞翔羽毛球馆 · 让运动更欢乐','#1f4fa8','#3b7be0'),pid:''},{src:products[0].cover,pid:'P1'},{src:sampleBanner('周末约球，提前锁场','最多可预订未来7天','#a5571c','#e0913b'),pid:''}];
+}catch(e){}
+let porders=[], verifies=[], pnid=20001;
+const usedCodes=new Set();
+function newCode(){let c;do{c=String(100000+Math.floor(Math.random()*900000))}while(usedCodes.has(c));usedCodes.add(c);return c}
+function mkPOrder(name,phone,p,qty){const o={id:pnid++,name,phone,pid:p.id,pname:p.name,cover:p.cover,unit:p.price,qty,amt:p.price*qty,validUntil:p.validUntil,status:'已支付',at:nowText(),refund:0,vouchers:[...Array(qty)].map(()=>({code:newCode(),status:'未使用'}))};porders.push(o);return o}
+try{if(products[0]){mkPOrder('王先生','13812345678',products[0],2)}}catch(e){}
+const findP=id=>products.find(p=>p.id===id);
+const pOnSale=p=>p.active&&(!p.validUntil||p.validUntil>=TODAY());
+let orders=[], locks=new Map(), notices=[], viewLog=[], nid=10001;
+const staff=[{name:'唐先生',acc:'tang',role:'老板',active:true},{name:'小李',acc:'xiaoli',role:'员工',active:true}];
+const S={pid:'',qty:1,otab:'court',okind:'court',vinfo:null,peditId:null,bi:0,view:'client',agreed:false,phone:null,ctab:'book',day:0,sel:new Set(),admin:null,atab:'orders',aday:0,revealed:new Set()};
+const K=(s,c,h)=>`${s}|${c}|${h}`;
+function takenMap(){const m={};orders.forEach(o=>{if(o.status==='已支付')o.slots.forEach(x=>m[K(o.date,x.c,x.h)]=o)});return m}
+function notify(t){notices.unshift({at:nowText(),t})}
+function mkOrder(name,phone,date,slots){const o={id:nid++,name,phone,date,slots,amt:slots.length*price(date),status:'已支付',at:nowText()};orders.push(o);return o}
+const firstH=o=>Math.min(...o.slots.map(x=>x.h));
+const canCancel=o=>o.status==='已支付'&&startMs(o.date,firstH(o))-Date.now()>15*6e4;
+const slotText=o=>{const by={};o.slots.forEach(x=>(by[x.c]=by[x.c]||[]).push(x.h));return Object.entries(by).map(([c,hs])=>{hs.sort((a,b)=>a-b);return `${c}号场 ${hs.map(h=>`${h}:00`).join('、')}`}).join('；')};
+// 示例数据
+(()=>{const t=TODAY();
+  mkOrder('王先生','13812345678',addD(t,1),[{c:3,h:19},{c:3,h:20}]);
+  mkOrder('李女士','13987654321',addD(t,1),[{c:5,h:20}]);
+  mkOrder('陈教练','13600001111',addD(t,2),[{c:1,h:10},{c:1,h:11},{c:2,h:10},{c:2,h:11}]);
+  mkOrder('赵同学','13711112222',t,[{c:4,h:21},{c:4,h:22}]);
+  locks.set(K(addD(t,1),10,19),'比赛');locks.set(K(addD(t,1),10,20),'比赛');
+  notify('新订单 #10004 赵同学 4号场，¥'+orders[3].amt);})();
+
+/* ---------- 通用 ---------- */
+const $=id=>document.getElementById(id);
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1800)}
+function sheet(h){$('sheetBody').innerHTML=h;$('sheet').hidden=false}
+function closeSheet(){$('sheet').hidden=true}
+$('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet()};
+const SCR='.pmain,.tbl-wrap,.grid-wrap,.days';
+/* 广告牌：每张10秒，可拖动/滑动切换 */
+function bnGo(i){const n=banners.length;if(!n)return;S.bi=((i%n)+n)%n;const t=document.querySelector('.bn-track');if(!t)return;t.style.transform=`translateX(-${S.bi*100}%)`;document.querySelectorAll('.bn-dots i').forEach((d,k)=>d.classList.toggle('on',k===S.bi))}
+let bnTimer=null;function bnRestart(){clearInterval(bnTimer);bnTimer=setInterval(()=>bnGo(S.bi+1),10000)}
+function bnHTML(){const n=banners.length;if(!n)return '';S.bi=S.bi%n;return `<div class="bn" id="bn"><div class="bn-track" style="transform:translateX(-${S.bi*100}%)">${banners.map((b,i)=>`<img src="${b.src}" alt="广告 ${i+1}" draggable="false">`).join('')}</div>${n>1?`<div class="bn-dots">${banners.map((_,i)=>`<i class="${i===S.bi?'on':''}"></i>`).join('')}</div>`:''}</div>`}
+function bindBanner(){const el=document.getElementById('bn');if(!el)return;let x0=null;el.onpointerdown=e=>{x0=e.clientX};el.onpointerup=e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>40){bnGo(S.bi+(dx<0?1:-1));bnRestart()}else{const b=banners[S.bi];if(b&&b.pid&&findP(b.pid)){S.ctab='act';S.pid=b.pid;S.qty=1;render()}}};el.onpointerleave=el.onpointercancel=()=>{x0=null}}
+// 鼠标滚轮滚左右条：在表格/日期栏上滚动时先左右移动，到头后再上下滚动
+document.addEventListener('wheel',e=>{
+  if(e.shiftKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+  const el=e.target.closest('.tbl-wrap,.grid-wrap,.days');if(!el)return;
+  const max=el.scrollWidth-el.clientWidth;if(max<=0)return;
+  const dy=e.deltaMode===1?e.deltaY*30:e.deltaY;
+  if((dy>0&&el.scrollLeft>=max-1)||(dy<0&&el.scrollLeft<=0))return;
+  e.preventDefault();el.scrollLeft+=dy;
+},{passive:false});
+function render(){
+  const k=[S.view,S.agreed,!!S.admin,S.ctab,S.atab,S.day,S.aday].join('|');
+  const keep=k===render.k?[...document.querySelectorAll(SCR)].map(e=>[e.scrollTop,e.scrollLeft]):null;
+  render.k=k;
+  S.view==='admin'?renderAdmin():renderClient();
+  if(keep)document.querySelectorAll(SCR).forEach((e,i)=>{if(keep[i]){e.scrollTop=keep[i][0];e.scrollLeft=keep[i][1]}});
+}
+function wxPay(amt,done){
+  sheet(`<div style="text-align:center"><p class="muted">微信支付</p><p style="font-size:30px;font-weight:700;margin:4px 0">¥${amt}.00</p><p class="muted">${VENUE} - 场地预订</p></div>
+  <button class="btn" id="wpB">支付</button><button class="btn ghost" id="wcB">取消</button><p class="muted">由微信官方接口 wx.requestPayment 拉起（示例，不会扣款）</p>`);
+  $('wpB').onclick=done;$('wcB').onclick=()=>{closeSheet();toast('已取消支付，场地为你保留10分钟')};
+}
+
+/* ---------- 协议文本 ---------- */
+const DOCS={
+privacy:`<h3>隐私政策</h3><p class="muted">更新日期：2026年10月26日　生效日期：2026年10月26日</p>
+<p>${CO}（以下简称“我们”）是“${VENUE}”小程序的运营者。我们非常重视你的个人信息保护，请你在使用前仔细阅读本政策。</p>
+<h4>一、我们收集哪些信息</h4><p>1. 微信账号标识（OpenID）：用于识别你的身份、保存你的订单。</p><p>2. 手机号码：在你点击授权后通过微信获取，用于订场联系、开场提醒及退款协商。你可以拒绝授权，但将无法完成订场。</p><p>3. 订单信息：场地预订的日期、场地、时段，活动商品的名称、数量、核销码及核销记录，以及金额、支付和退款状态。</p><p>我们不会收集你的位置、通讯录、相册等与订场无关的信息。</p>
+<h4>二、我们如何使用这些信息</h4><p>仅用于：完成场地预订、活动商品购买与支付；到店核销；开场前提醒；处理取消、退款及相关协商；统计场馆经营数据（统计结果不含个人身份）。</p>
+<h4>三、谁可以看到你的手机号</h4><p>仅限本馆负责人及经授权的工作人员，在处理订单和退款时查看。每一次查看都会被系统记录，防止滥用。</p>
+<h4>四、信息共享</h4><p>支付与退款通过微信支付完成，需向财付通支付科技有限公司提供订单金额等必要信息。除法律法规要求外，我们不会向任何第三方出售、出租或提供你的个人信息。</p>
+<h4>五、保存期限</h4><p>1. 手机号码：自你最后一次订场之日起保存1年，期满自动删除。</p><p>2. 订单记录：按财务、税务法规要求保存；手机号删除后，订单记录不再与你的身份关联。</p><p>3. 你注销账号后，我们将立即删除你的手机号等个人信息。</p>
+<h4>六、存储与安全</h4><p>你的信息存储于中华人民共和国境内的服务器。我们采取访问权限控制、查看留痕等措施保护你的信息安全。</p>
+<h4>七、你的权利</h4><p>你可以在小程序“我的”页面随时查看本政策、注销账号并删除个人信息。如需查询、更正信息或撤回授权，可联系我们。</p>
+<h4>八、未成年人保护</h4><p>未满14周岁的未成年人，请在监护人同意和陪同下使用本服务。</p>
+<h4>九、政策更新</h4><p>本政策如有重大变化，我们会在小程序内提示，并再次征得你的同意。</p>
+<h4>十、联系我们</h4><p>运营者：${CO}</p><p>联系人：${CONTACT}</p><p>我们将在15个工作日内回复你的请求。</p>`,
+terms:`<h3>用户协议</h3><p class="muted">更新日期：2026年10月26日</p>
+<h4>一、服务内容</h4><p>本小程序为${VENUE}提供在线场地预订服务，运营者为${CO}。</p>
+<h4>二、预订与支付</h4><p>场地以1小时为单位预订，可预订未来7天内的场地。下单后需在10分钟内完成微信支付，超时订单自动取消。价格分工作日与节假日（含周末及法定节假日），以下单时页面显示的价格为准。</p>
+<h4>三、取消与退款</h4><p>开场前15分钟以前，可在“订单”页面自助取消，款项全额原路退回。距开场不足15分钟的订单无法自助取消，如有特殊情况请联系馆方协商。因场馆原因无法提供场地的，我们将全额退款。</p>
+<h4>四、活动商品</h4><p>活动商品购买后，每一份生成一个核销码（二维码及6位数字码），到店出示即可使用。未核销的券可在“订单”页自助退款，全额原路退回；已核销的券不能退款。设有有效期的商品，过期仍未核销的券将自动全额退款。</p>
+<h4>五、场馆使用</h4><p>请按预订时间入场、准时离场，遵守场馆规定，爱护设施。运动有风险，请量力而行，做好热身。</p>
+<h4>六、账号</h4><p>请使用本人微信账号及手机号订场。你可随时在“我的”页面注销账号。</p>
+<h4>七、协议变更</h4><p>本协议如有修改，我们会在小程序内提示，继续使用即视为同意修改后的协议。</p>
+<h4>八、争议解决</h4><p>本协议适用中华人民共和国法律。发生争议协商不成的，可向运营者所在地人民法院提起诉讼。</p>
+<h4>九、联系方式</h4><p>${CONTACT}</p>`};
+const showDoc=k=>{sheet(`<div class="doc">${DOCS[k]}</div><button class="btn" onclick="closeSheet()">我知道了</button>`)};
+
+/* ================= 客户端 ================= */
+function renderClient(){
+  const top=`<div class="top"><span>${VENUE}</span><small>北京时间 ${nowText().slice(11)}</small></div>`;
+  if(!S.agreed){
+    $('app').innerHTML=`<div class="phone">${top}<div class="gate">
+      <img class="logo-img" src="data:image/jpeg;base64,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GQG2Gm2kDsShISPcKA4De3amHurpB6DwNou0UKdt8g8uBzH0Cfsqxg+w91eWwuh9T7f6EZs2p7m1LeSsrYjt+cIaD/2uP63PJ5chnAyKkelAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQERI6OVgnbnXPW+oJT96TIcS9FgyvOQysDnxfbSMDhT2Adua5jVHRGY1fqi6X65a0m8U+St4NIiJ+aST5qASrsSMDs7qsJSgK7xehTo9GPKtRX1/0I6pA/kNdpoPo3aI281DGv8AalXV6fGSsNqlSApI4klJOAkdxNSpSgOX1/ttpzcu3xoOooZfRFfS+0tCuFaCCMpB8FAYI8PSAa3S7FanLSmzuW2Iu2pbDQiKaSWggDATwkYxWdSgI+d6P+1zzpdXou2cROTwhSR7gcVmRdk9t4RBZ0VY8jvXGSv+bNdrSgMO12a2WON5LarfEgR88XVRWUtIz44SAM1mUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAf/9k=" alt="${VENUE}"><p class="muted">欢迎使用在线订场</p>
+      <label class="chk"><input type="checkbox" id="agChk"><span>我已阅读并同意<button class="lnk" data-doc="terms">《用户协议》</button>和<button class="lnk" data-doc="privacy">《隐私政策》</button></span></label>
+      <button class="btn" id="agBtn" disabled>同意并微信一键登录</button>
+      <p class="muted">使用微信身份登录（wx.login），无需另外注册</p>
+      <button class="lnk" id="noBtn">不同意</button>
+      <p class="muted" id="noMsg" hidden>需要同意协议后才能使用订场服务。你可以随时重新勾选同意。</p>
+      <button class="lnk" id="gAdm" style="margin-top:24px;font-size:12px">管理员登录</button></div></div>`;
+    $('gAdm').onclick=()=>{S.view='admin';render()};
+    $('agChk').onchange=e=>$('agBtn').disabled=!e.target.checked;
+    $('agBtn').onclick=()=>{S.agreed=true;render()};
+    $('noBtn').onclick=()=>$('noMsg').hidden=false;
+    document.querySelectorAll('[data-doc]').forEach(b=>b.onclick=e=>{e.preventDefault();showDoc(b.dataset.doc)});
+    return;
+  }
+  const tabs=[['book','订场'],['act','活动'],['mine','订单'],['me','我的']];
+  $('app').innerHTML=`<div class="phone">${top}<div class="pmain" id="pv"></div><nav class="tabs">${tabs.map(([k,t])=>`<button data-ct="${k}" class="${S.ctab===k?'on':''}">${t}</button>`).join('')}</nav></div>`;
+  document.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>{S.ctab=b.dataset.ct;S.pid='';render()});
+  ({book:cBook,act:cAct,mine:cMine,me:cMe})[S.ctab]();
+}
+
+function cBook(){
+  const ds=days7(), d=ds[S.day], tk=takenMap(), p=price(d);
+  let h=bnHTML()+`<div class="days">${ds.map((x,i)=>`<button data-d="${i}" class="${i===S.day?'on':''}">${i?'周'+WK[dow(x)]:'今天'}<br>${+x.slice(5,7)}/${+x.slice(8)}<em>${isHol(x)?'节假日':'工作日'} ¥${price(x)}</em></button>`).join('')}</div>`;
+  h+=`<div class="row"><span>${md(d)} ${isHol(d)?'节假日':'工作日'}价 <b>¥${p}</b>/小时</span><span class="muted">营业 ${settings.open}:00–${settings.close}:00</span></div>`;
+  h+=`<div class="legend"><span><i></i>可订</span><span><i style="background:var(--accent)"></i>已选</span><span><i style="background:var(--taken)"></i>已订</span><span><i style="background:var(--lock)"></i>馆方保留</span></div>`;
+  h+=`<div class="grid-wrap"><table class="grid"><tr><th>时段</th>${[...Array(COURTS)].map((_,i)=>`<th>${i+1}号</th>`).join('')}</tr>`;
+  for(let hr=settings.open;hr<settings.close;hr++){
+    h+=`<tr><th>${hr}:00</th>`;
+    for(let c=1;c<=COURTS;c++){
+      const k=K(d,c,hr);let cls='',t='',dis='';
+      if(startMs(d,hr)<=Date.now()){cls='past';t='—';dis='disabled'}
+      else if(locks.has(k)){cls='lock';t='保留';dis='disabled'}
+      else if(tk[k]){cls='taken';t='已订';dis='disabled'}
+      else if(S.sel.has(k)){cls='sel';t='✓'}
+      h+=`<td><button class="${cls}" data-k="${k}" ${dis} aria-label="${c}号场 ${hr}点">${t}</button></td>`;
+    }
+    h+='</tr>';
+  }
+  h+=`</table></div><div class="bar"><span>已选 ${S.sel.size} 小时　合计 <b>¥${S.sel.size*p}</b></span><button class="btn" id="payBtn" ${S.sel.size?'':'disabled'}>微信支付</button></div>`;
+  $('pv').innerHTML=h;
+  document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{S.day=+b.dataset.d;S.sel.clear();render()});
+  document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;S.sel.has(k)?S.sel.delete(k):S.sel.add(k);render()});
+  $('payBtn').onclick=()=>S.phone?confirmPay():askPhone(confirmPay);
+  bindBanner();
+}
+function askPhone(next){
+  sheet(`<h3>${VENUE} 申请</h3><p>获取你的手机号</p><p class="muted">用于订场联系、开场提醒及退款协商，仅馆方可见。</p><p><b>135 **** 2203</b>　微信绑定号码</p>
+  <button class="btn" id="okB">允许</button><button class="btn ghost" id="noB">不允许</button><p class="muted">微信官方“手机号快速验证”（getPhoneNumber）</p>`);
+  $('okB').onclick=()=>{S.phone='13800000000';closeSheet();next()};
+  $('noB').onclick=()=>{closeSheet();toast('需要手机号才能订场')};
+}
+function confirmPay(){
+  const d=days7()[S.day], slots=[...S.sel].map(k=>{const[,c,h]=k.split('|');return{c:+c,h:+h}}), amt=slots.length*price(d);
+  const tmp={slots};
+  sheet(`<h3>确认订单</h3><p>${md(d)} 周${WK[dow(d)]}</p><p>${slotText(tmp)}</p><p>金额 <b>¥${amt}</b></p>
+  <p class="muted">请在10分钟内完成支付，超时场地自动释放。开场前15分钟以前可自助取消并全额退款。（示例，不会真的扣款）</p>
+  <button class="btn" id="okB">确认支付 ¥${amt}</button><button class="btn ghost" id="noB">返回修改</button>`);
+  $('okB').onclick=()=>{
+    const tk=takenMap();
+    if(slots.some(x=>tk[K(d,x.c,x.h)]||locks.has(K(d,x.c,x.h)))){closeSheet();S.sel.clear();toast('有场地刚被别人订走，请重新选择');return render()}
+    wxPay(amt,()=>{
+      const o=mkOrder('微信用户'+S.phone.slice(7),S.phone,d,slots);
+      notify(`新订单 #${o.id} ${o.name}，${md(d)} ${slotText(o)}，¥${o.amt}`);
+      S.sel.clear();closeSheet();toast('支付成功');S.ctab='mine';S.otab='court';render();
+    });
+  };
+  $('noB').onclick=closeSheet;
+}
+function cMine(){
+  const seg=`<div class="seg"><button data-ot="court" class="${S.otab==='court'?'on':''}">订场</button><button data-ot="act" class="${S.otab==='act'?'on':''}">活动</button></div>`;
+  if(S.otab==='act'){cMineAct(seg);return}
+  const mine=orders.filter(o=>S.phone&&o.phone===S.phone).slice().reverse();
+  let h=seg+`<p class="muted">开场前1小时，会通过微信服务通知提醒你。</p>`;
+  h+=mine.length?mine.map(o=>`<div class="item"><div class="row"><b>${md(o.date)} 周${WK[dow(o.date)]}</b><span class="pill ${o.status==='已支付'?'':'off'}">${o.status}</span></div>
+    <div>${slotText(o)}</div><div class="row"><span class="muted">订单号 ${o.id}</span><b>¥${o.amt}</b></div>
+    ${o.status==='已支付'?(canCancel(o)?`<button class="btn red" data-cx="${o.id}">取消并退款</button>`:`<span class="muted">距开场不足15分钟，无法自助取消。如需退款请联系 ${CONTACT}</span>`):''}</div>`).join('')
+    :`<p class="muted">还没有订单，去“订场”选个时段吧。</p>`;
+  $('pv').innerHTML=h;
+  bindSeg();
+  document.querySelectorAll('[data-cx]').forEach(b=>b.onclick=()=>{
+    const o=orders.find(x=>x.id==b.dataset.cx);
+    sheet(`<h3>取消订单 ${o.id}？</h3><p>将全额退回 ¥${o.amt} 到你的微信。</p><button class="btn red" id="okB">确定取消</button><button class="btn ghost" id="noB">先不取消</button>`);
+    $('okB').onclick=()=>{o.status='已退款';notify(`客户取消 #${o.id}，已自动退款 ¥${o.amt}`);closeSheet();toast('已取消，退款将原路返回');render()};
+    $('noB').onclick=closeSheet;
+  });
+}
+function cMe(){
+  $('pv').innerHTML=`<div class="item"><span class="muted">我的手机号</span><b>${S.phone?maskPhone(S.phone):'未授权（订场时授权）'}</b></div>
+  <div class="menu"><button data-doc="terms">用户协议<span>›</span></button><button data-doc="privacy">隐私政策<span>›</span></button>
+  <button id="ctB">联系馆方<span class="muted">${CONTACT}</span></button><button id="delB" class="danger">注销账号<span>›</span></button></div>
+  <div class="menu"><button id="admB">管理员登录<span>›</span></button></div>
+  <p class="muted">主体：${CO}</p>`;
+  $('admB').onclick=()=>{S.view='admin';render()};
+  document.querySelectorAll('[data-doc]').forEach(b=>b.onclick=()=>showDoc(b.dataset.doc));
+  $('ctB').onclick=()=>toast('请致电 '+CONTACT);
+  $('delB').onclick=()=>{
+    const pending=orders.some(o=>o.phone===S.phone&&S.phone&&o.status==='已支付'&&startMs(o.date,firstH(o))>Date.now());
+    const pv=porders.some(o=>S.phone&&o.phone===S.phone&&o.vouchers.some(v=>v.status==='未使用'));
+    if(pv)return sheet(`<h3>暂时无法注销</h3><p>你还有未使用的活动券。请先使用或退款后再注销。</p><button class="btn" onclick="closeSheet()">知道了</button>`);
+    if(pending)return sheet(`<h3>暂时无法注销</h3><p>你还有未开场的订单。请先取消，或等订单结束后再注销。</p><button class="btn" onclick="closeSheet()">知道了</button>`);
+    sheet(`<h3>确定注销账号？</h3><p>注销后将立即删除你的手机号等个人信息，且无法恢复。历史订单金额记录会按财务要求保留，但不再关联你的身份。</p>
+    <button class="btn red" id="okB">确认注销</button><button class="btn ghost" id="noB">取消</button>`);
+    $('okB').onclick=()=>{orders.concat(porders).forEach(o=>{if(S.phone&&o.phone===S.phone){o.phone=null;o.name='已注销用户'}});S.phone=null;S.agreed=false;S.ctab='book';closeSheet();toast('账号已注销');render()};
+    $('noB').onclick=closeSheet;
+  };
+}
+
+function bindSeg(){document.querySelectorAll('[data-ot]').forEach(b=>b.onclick=()=>{S.otab=b.dataset.ot;render()})}
+function cAct(){
+  if(S.pid){cProduct();return}
+  const list=products.filter(pOnSale);
+  $('pv').innerHTML=list.length?list.map(p=>{const out=p.left!=null&&p.left<=0;return `<button class="pcard ${out?'out':''}" data-pid="${p.id}"><div class="ptag"><img src="${p.cover}" alt="${p.name}">${out?'<span>已售罄</span>':''}</div><div class="pinfo"><div><div class="nm">${p.name}</div><div class="muted">${p.validUntil?'有效期至 '+p.validUntil:'长期有效'}${p.left!=null&&!out?' · 剩 '+p.left+' 份':''}</div></div><div class="price">¥<b>${p.price}</b></div></div></button>`}).join(''):'<p class="muted">暂时没有活动，敬请期待。</p>';
+  document.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{S.pid=b.dataset.pid;S.qty=1;render()});
+}
+function cProduct(){
+  const p=findP(S.pid);if(!p){S.pid='';return cAct()}
+  const out=p.left!=null&&p.left<=0, can=pOnSale(p)&&!out, max=Math.max(1,Math.min(20,p.left==null?20:p.left));
+  if(S.qty>max)S.qty=max;
+  const total=Math.round(p.price*S.qty*100)/100;
+  $('pv').innerHTML=`<img class="pd-cover" src="${p.cover}" alt="${p.name}">
+  <div class="row" style="align-items:flex-start"><h3 style="flex:1;min-width:0">${p.name}</h3><span class="price">¥<b>${p.price}</b></span></div>
+  <div class="muted">${p.validUntil?'有效期至 '+p.validUntil+'，过期未使用自动全额退款':'长期有效'}${p.left!=null?(out?' · 已售罄':' · 剩余 '+p.left+' 份'):''}</div>
+  <div class="muted">购买后凭核销码到店使用；未使用前可随时在“订单”页退款</div>
+  ${p.desc?`<p style="margin:0;line-height:1.7">${p.desc}</p>`:''}
+  ${p.images.map((src,i)=>`<img class="pd-img" src="${src}" alt="详情图 ${i+1}">`).join('')}
+  <div class="bar"><span class="row" style="gap:10px;flex-wrap:nowrap"><span class="stepper"><button id="qm" ${S.qty<=1?'disabled':''} aria-label="减少">－</button><span>${S.qty}</span><button id="qp" ${S.qty>=max||!can?'disabled':''} aria-label="增加">＋</button></span><span>合计 <b>¥${total}</b></span></span><button class="btn" id="ppay" ${can?'':'disabled'}>${can?'微信支付':out?'已售罄':'已下架'}</button></div>
+  <button class="lnk" id="pback" style="align-self:flex-start">‹ 返回活动列表</button>`;
+  $('qm').onclick=()=>{S.qty--;render()};$('qp').onclick=()=>{S.qty++;render()};
+  $('pback').onclick=()=>{S.pid='';render()};
+  $('ppay').onclick=()=>{const go=()=>{
+    if(p.left!=null&&p.left<S.qty){toast(p.left?`只剩 ${p.left} 份了`:'已售罄');return render()}
+    wxPay(total,()=>{if(p.left!=null)p.left-=S.qty;p.sold+=S.qty;const o=mkPOrder('微信用户'+S.phone.slice(7),S.phone,p,S.qty);notify(`活动新订单 #${o.id} ${p.name} ×${o.qty}，¥${o.amt}`);closeSheet();toast('支付成功');S.pid='';S.ctab='mine';S.otab='act';render()})};
+    S.phone?go():askPhone(go)};
+}
+function cMineAct(seg){
+  const mine=porders.filter(o=>S.phone&&o.phone===S.phone).slice().reverse();
+  const today=TODAY();
+  $('pv').innerHTML=seg+(mine.length?mine.map(o=>{const exp=o.validUntil&&o.validUntil<today;return `<div class="item"><div class="thumbrow"><img src="${o.cover}" alt=""><div><div class="row"><b>${o.pname}</b><span class="pill ${o.status==='已支付'?'':'off'}">${o.status}</span></div><span class="muted">¥${o.unit} × ${o.qty}　合计 ¥${o.amt}</span><span class="muted">${o.validUntil?'有效期至 '+o.validUntil:'长期有效'}</span></div></div>
+    ${o.vouchers.map((v,j)=>`<div class="vch ${v.status==='未使用'?'':'off'}"><button class="lk" data-qr="${o.id}|${j}" ${v.status==='未使用'?'':'disabled'}><span class="muted">第 ${j+1} 张</span><div class="code">${v.code}</div><span class="muted">${v.status==='未使用'?'点这里出示二维码':v.usedAt?v.usedAt+' 已核销':''}</span></button><span class="row" style="flex-direction:column;align-items:flex-end;gap:6px"><span class="pill ${v.status==='未使用'?'':'off'}">${v.status}</span>${v.status==='未使用'&&!exp?`<button class="lnk" style="color:var(--danger)" data-rf="${o.id}|${j}">退款</button>`:''}</span></div>`).join('')}
+    ${o.refund?`<span class="muted">已退款 ¥${o.refund}，原路退回微信</span>`:''}</div>`}).join(''):'<p class="muted">还没有活动订单，去“活动”看看吧。</p>');
+  bindSeg();
+  document.querySelectorAll('[data-qr]').forEach(b=>b.onclick=()=>{const[id,j]=b.dataset.qr.split('|');const o=porders.find(x=>x.id==id),v=o.vouchers[+j];
+    sheet(`<div class="qrwrap"><h3>${o.pname}</h3><span class="muted">第 ${+j+1} / ${o.qty} 张　${o.validUntil?'有效期至 '+o.validUntil:'长期有效'}</span>${qrSVG('FXV:'+v.code,200)}<div class="bigcode">${v.code}</div><span class="muted">请向店员出示二维码，或报上方6位数字码</span></div><button class="btn" onclick="closeSheet();render()">完成</button>`)});
+  document.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>{const[id,j]=b.dataset.rf.split('|');const o=porders.find(x=>x.id==id),v=o.vouchers[+j];
+    sheet(`<h3>退款</h3><p>${o.pname}（第 ${+j+1} 张，券码 ${v.code}）</p><p>将退回 ¥${o.unit} 到你的微信，退款后这张券作废。</p><button class="btn red" id="okB">确定退款</button><button class="btn ghost" id="noB">先不退</button>`);
+    $('okB').onclick=()=>{refundV(o,+j,'客户');closeSheet();toast('已退款');render()};$('noB').onclick=closeSheet});
+}
+function refundV(o,j,by){const v=o.vouchers[j];if(v.status!=='未使用')return;v.status='已退款';o.refund+=o.unit;const p=findP(o.pid);if(p){p.sold--;if(p.left!=null)p.left++}
+  if(o.vouchers.every(x=>x.status==='已退款'))o.status='已退款';notify(`${by}退款：${o.pname} 券 ${v.code}，¥${o.unit}`)}
+
+/* ================= 管理后台 ================= */
+function renderAdmin(){
+  if(!S.admin){
+    $('app').innerHTML=`<div class="phone"><div class="top"><span>管理员登录</span><button class="lnk" id="backB" style="color:#fff">返回</button></div><div class="gate">
+      <img class="logo-img" src="data:image/jpeg;base64,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GQG2Gm2kDsShISPcKA4De3amHurpB6DwNou0UKdt8g8uBzH0Cfsqxg+w91eWwuh9T7f6EZs2p7m1LeSsrYjt+cIaD/2uP63PJ5chnAyKkelAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQERI6OVgnbnXPW+oJT96TIcS9FgyvOQysDnxfbSMDhT2Adua5jVHRGY1fqi6X65a0m8U+St4NIiJ+aST5qASrsSMDs7qsJSgK7xehTo9GPKtRX1/0I6pA/kNdpoPo3aI281DGv8AalXV6fGSsNqlSApI4klJOAkdxNSpSgOX1/ttpzcu3xoOooZfRFfS+0tCuFaCCMpB8FAYI8PSAa3S7FanLSmzuW2Iu2pbDQiKaSWggDATwkYxWdSgI+d6P+1zzpdXou2cROTwhSR7gcVmRdk9t4RBZ0VY8jvXGSv+bNdrSgMO12a2WON5LarfEgR88XVRWUtIz44SAM1mUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAKUpQClKUApSlAf/9k=" alt="${VENUE}"><p class="muted">仅限馆方工作人员</p>
+      <input id="acc" placeholder="账号" value="tang"><input id="pw" type="password" placeholder="密码" value="demo1234">
+      <button class="btn" id="loginB">登录</button><p class="muted">示例账号：tang（老板）、xiaoli（员工），密码都是 demo1234</p></div></div>`;
+    $('backB').onclick=()=>{S.view='client';S.ctab='me';render()};
+    $('loginB').onclick=()=>{const u=staff.find(x=>x.acc===$('acc').value.trim()&&x.active);
+      if(!u||$('pw').value!=='demo1234')return toast('账号或密码错误');
+      S.admin=u;S.atab='orders';S.vinfo=null;S.revealed.clear();render()};
+    return;
+  }
+  const boss=S.admin.role==='老板';
+  const nav=[['orders','订单'],['verify','核销'],['products','商品管理'],['courts','锁场'],['banner','广告牌'],['notice','通知']].concat(boss?[['price','价格'],['hours','营业时间'],['report','报表'],['staff','员工'],['log','查看记录']]:[]);
+  if(!nav.some(n=>n[0]===S.atab))S.atab='orders';
+  $('app').innerHTML=`<div class="phone"><div class="top"><span>管理后台 · ${S.admin.name}（${S.admin.role}）</span><button class="lnk" id="outB" style="color:#fff">退出</button></div>
+    <div class="anavbar"><b>${(nav.find(n=>n[0]===S.atab)||[0,''])[1]}</b><span class="muted">${S.admin.name}（${S.admin.role}）</span><button id="navT" class="${S.navOpen?'open':''}" aria-expanded="${!!S.navOpen}">${S.navOpen?'收起':'全部功能'}<i>▾</i></button></div>
+    ${S.navOpen?`<div class="anav">${nav.map(([k,t])=>`<button data-at="${k}" class="${S.atab===k?'on':''}">${t}${k==='notice'&&notices.length?` (${notices.length})`:''}</button>`).join('')}</div>`:''}
+    <div class="pmain" id="av"></div></div>`;
+  $('outB').onclick=()=>{S.admin=null;S.view='client';S.ctab='me';render()};
+  $('navT').onclick=()=>{S.navOpen=!S.navOpen;render()};
+  document.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{S.atab=b.dataset.at;S.navOpen=false;render()});
+  ({verify:aVerify,products:aProducts,orders:aOrders,courts:aCourts,notice:aNotice,price:aPrice,banner:aBanner,hours:aHours,report:aReport,staff:aStaff,log:aLog})[S.atab]();
+}
+function aOrders(){
+  const seg=`<div class="seg"><button data-ok="court" class="${S.okind==='court'?'on':''}">订场订单</button><button data-ok="act" class="${S.okind==='act'?'on':''}">活动订单</button></div>`;
+  if(S.okind==='act'){aPOrders(seg);return}
+  const list=orders.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  $('av').innerHTML=seg+`<h3>订场订单</h3><p class="muted">电话默认隐藏，点“查看”后显示，并记录查看人和时间。管理员可随时为客户取消并全额退款。</p>
+  <div class="tbl-wrap"><table class="tbl"><tr><th>订单号</th><th>日期</th><th>场地时段</th><th>客户</th><th>电话</th><th>金额</th><th>状态</th><th>操作</th></tr>
+  ${list.map(o=>`<tr><td>${o.id}</td><td>${md(o.date)} 周${WK[dow(o.date)]}</td><td>${slotText(o)}</td><td>${o.name}</td>
+  <td>${!o.phone?'<span class="muted">已注销</span>':S.revealed.has(o.id)?`<b>${fmtPhone(o.phone)}</b> <button class="btn ghost sm" data-cp="${o.phone}">复制</button>`:`${maskPhone(o.phone)} <button class="btn ghost sm" data-rv="${o.id}">查看</button>`}</td>
+  <td>¥${o.amt}</td><td><span class="pill ${o.status==='已支付'?'':'off'}">${o.status}</span></td>
+  <td>${o.status==='已支付'?`<button class="btn red sm" data-cx="${o.id}">取消并退款</button>`:''}</td></tr>`).join('')}</table></div>`;
+  document.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>{S.okind=b.dataset.ok;render()});
+  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>{const o=orders.find(x=>x.id==b.dataset.rv);S.revealed.add(o.id);viewLog.unshift({at:nowText(),who:S.admin.name,id:o.id,ph:maskPhone(o.phone)});render()});
+  document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{const t=b.dataset.cp;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('已复制 '+t),()=>toast('请手动选中号码复制'))});
+  document.querySelectorAll('[data-cx]').forEach(b=>b.onclick=()=>{
+    const o=orders.find(x=>x.id==b.dataset.cx);
+    sheet(`<h3>为客户取消订单 ${o.id}？</h3><p>${o.name}，${md(o.date)} ${slotText(o)}</p><p>将全额退回 <b>¥${o.amt}</b> 到客户微信。</p><button class="btn red" id="okB">确认取消并退款</button><button class="btn ghost" id="noB">返回</button>`);
+    $('okB').onclick=()=>{o.status='已退款';notify(`${S.admin.name} 取消了 #${o.id}，退款 ¥${o.amt}`);closeSheet();toast('已退款');render()};$('noB').onclick=closeSheet;
+  });
+}
+function aCourts(){
+  const ds=days7(), d=ds[S.aday], tk=takenMap();
+  let h=`<h3>场地 / 锁场</h3><p class="muted">点空格锁场（维修、比赛、熟客留场），点“保留”格解锁。已订的格子显示客户姓氏。</p>
+  <div class="days">${ds.map((x,i)=>`<button data-d="${i}" class="${i===S.aday?'on':''}">${md(x)}<em>周${WK[dow(x)]} ${isHol(x)?'节假日':'工作日'}</em></button>`).join('')}</div>
+  <div class="grid-wrap"><table class="grid"><tr><th>时段</th>${[...Array(COURTS)].map((_,i)=>`<th>${i+1}号</th>`).join('')}</tr>`;
+  for(let hr=settings.open;hr<settings.close;hr++){
+    h+=`<tr><th>${hr}:00</th>`;
+    for(let c=1;c<=COURTS;c++){const k=K(d,c,hr),o=tk[k];
+      if(locks.has(k))h+=`<td><button class="lock" data-ul="${k}" title="${locks.get(k)}">保留</button></td>`;
+      else if(o)h+=`<td><button class="taken" disabled title="${o.name}">${o.name[0]}</button></td>`;
+      else if(startMs(d,hr)<=Date.now())h+=`<td><button class="past" disabled>—</button></td>`;
+      else h+=`<td><button data-lk="${k}" aria-label="锁 ${c}号场 ${hr}点"></button></td>`;}
+    h+='</tr>';
+  }
+  $('av').innerHTML=h+'</table></div>';
+  document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{S.aday=+b.dataset.d;render()});
+  document.querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>{const[dd,c,hr]=b.dataset.lk.split('|');
+    sheet(`<h3>锁场：${md(dd)} ${c}号场 ${hr}:00</h3><select id="rs"><option>维修</option><option>比赛</option><option>熟客留场</option><option>其他</option></select><button class="btn" id="okB">确认锁场</button><button class="btn ghost" id="noB">取消</button>`);
+    $('okB').onclick=()=>{locks.set(b.dataset.lk,$('rs').value);closeSheet();toast('已锁场');render()};$('noB').onclick=closeSheet;});
+  document.querySelectorAll('[data-ul]').forEach(b=>b.onclick=()=>{const[dd,c,hr]=b.dataset.ul.split('|');
+    sheet(`<h3>解锁：${md(dd)} ${c}号场 ${hr}:00</h3><p>当前原因：${locks.get(b.dataset.ul)}</p><button class="btn" id="okB">解锁，开放预订</button><button class="btn ghost" id="noB">取消</button>`);
+    $('okB').onclick=()=>{locks.delete(b.dataset.ul);closeSheet();toast('已解锁');render()};$('noB').onclick=closeSheet;});
+}
+function aVerify(){
+  const v=S.vinfo, today=TODAY(), log=verifies.filter(x=>x.day===today);
+  $('av').innerHTML=`<button class="btn scanbtn" id="scanB">扫码核销</button>
+  <div class="box"><b>扫不了？输入客人的6位数字码</b><div class="form"><input id="vc" inputmode="numeric" maxlength="6" placeholder="6位数字码" style="flex:1;min-width:0"><button class="btn" id="vq">查询</button></div></div>
+  ${v?`<div class="box vinfo ${v.ok?'good':'bad'}"><div class="row"><b>${v.o.pname}</b><span class="pill ${v.ok?'':'off'}">${v.exp&&v.v.status==='未使用'?'已过期':v.v.status}</span></div>
+    <div>券码 <b>${v.v.code}</b>　第 ${v.j+1}/${v.o.qty} 张　¥${v.o.unit}</div>
+    <span class="muted">客户手机尾号 ${v.o.phone?v.o.phone.slice(-4):'—'} · ${v.o.validUntil?'有效期至 '+v.o.validUntil:'长期有效'}</span>
+    ${v.v.usedAt?`<span class="muted">${v.v.usedAt} 由 ${v.v.usedBy} 核销</span>`:''}
+    <div class="row" style="gap:8px;justify-content:flex-start">${v.ok?'<button class="btn" id="vok">确认核销</button>':''}<button class="btn ghost" id="vcl">${v.ok?'取消':'关闭'}</button></div></div>`:''}
+  <div class="box"><b>今天已核销（${log.length}）</b>${log.length?log.map(x=>`<div class="row"><span>${x.name}<br><span class="muted">券码 ${x.code} · ${x.by}</span></span><span class="muted">${x.time}</span></div>`).join(''):'<span class="muted">今天还没有核销记录</span>'}</div>`;
+  const find=code=>{code=String(code).trim().replace(/^FXV:/,'');if(!/^\d{6}$/.test(code))return toast('请输入6位数字核销码');
+    for(const o of porders){const j=o.vouchers.findIndex(x=>x.code===code);if(j>=0){const exp=!!o.validUntil&&o.validUntil<TODAY();S.vinfo={o,j,v:o.vouchers[j],exp,ok:o.vouchers[j].status==='未使用'&&!exp};return render()}}
+    S.vinfo=null;toast('核销码不存在，请核对后再试');render()};
+  $('vq').onclick=()=>find($('vc').value);$('vc').onkeydown=e=>{if(e.key==='Enter')find($('vc').value)};
+  $('scanB').onclick=()=>{const un=porders.flatMap(o=>o.vouchers.filter(x=>x.status==='未使用').map(x=>({o,x})));
+    sheet(`<h3>扫码核销</h3><p class="muted">正式版会打开手机摄像头扫客人的二维码。试玩页请选一张客人的券，模拟“扫到了”。</p>${un.length?un.map(({o,x})=>`<button class="btn ghost" data-sc="${x.code}">${o.pname} · ${x.code}</button>`).join(''):'<p class="muted">现在没有未使用的券。可以先在客户端“活动”里买一份。</p>'}<button class="btn ghost" onclick="closeSheet()">取消</button>`);
+    document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{closeSheet();find(b.dataset.sc)})};
+  if(v){if($('vok'))$('vok').onclick=()=>{if(v.v.status!=='未使用')return toast('这张券'+v.v.status);v.v.status='已核销';v.v.usedAt=nowText();v.v.usedBy=S.admin.name;const p=findP(v.o.pid);if(p)p.used++;
+      verifies.unshift({day:TODAY(),time:nowText().slice(11),code:v.v.code,name:v.o.pname,by:S.admin.name});S.vinfo=null;
+      sheet(`<h3>核销成功</h3><p>${v.o.pname}（第 ${v.j+1}/${v.o.qty} 张）</p><button class="btn" onclick="closeSheet()">好的</button>`);render()};
+    $('vcl').onclick=()=>{S.vinfo=null;render()}}
+}
+function aPOrders(seg){
+  const list=porders.slice().reverse();
+  $('av').innerHTML=seg+`<h3>活动订单</h3><p class="muted">未核销的券可以为客户单张退款。</p>`+(list.length?list.map(o=>`<div class="item"><div class="row"><b>${o.pname}</b><span class="pill ${o.status==='已支付'?'':'off'}">${o.status}</span></div>
+    <div class="row"><span class="muted">#${o.id} · ${o.at}</span><b>¥${o.unit} × ${o.qty}</b></div>
+    <div class="row"><span>${o.name}　${!o.phone?'<span class="muted">已注销</span>':S.revealed.has('p'+o.id)?`<b>${fmtPhone(o.phone)}</b>`:maskPhone(o.phone)}</span>${o.phone&&!S.revealed.has('p'+o.id)?`<button class="btn ghost sm" data-rp="${o.id}">查看电话</button>`:''}</div>
+    ${o.vouchers.map((v,j)=>`<div class="row" style="border-top:1px solid var(--line);padding-top:6px"><span>第${j+1}张 ${v.code}</span><span class="muted">${v.usedAt?v.usedAt+' '+v.usedBy:''}</span><span class="pill ${v.status==='未使用'?'':'off'}">${v.status}</span>${v.status==='未使用'?`<button class="btn red sm" data-arf="${o.id}|${j}">退款</button>`:''}</div>`).join('')}
+    ${o.refund?`<span class="muted">已退款 ¥${o.refund}</span>`:''}</div>`).join(''):'<p class="muted">还没有活动订单。</p>');
+  document.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>{S.okind=b.dataset.ok;render()});
+  document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const o=porders.find(x=>x.id==b.dataset.rp);S.revealed.add('p'+o.id);viewLog.unshift({at:nowText(),who:S.admin.name,id:o.id,ph:maskPhone(o.phone)});render()});
+  document.querySelectorAll('[data-arf]').forEach(b=>b.onclick=()=>{const[id,j]=b.dataset.arf.split('|');const o=porders.find(x=>x.id==id);
+    sheet(`<h3>为客户退款</h3><p>${o.pname} 第 ${+j+1} 张（券码 ${o.vouchers[+j].code}）</p><p>将退回 ¥${o.unit} 到客户微信，这张券作废。</p><button class="btn red" id="okB">确认退款</button><button class="btn ghost" id="noB">返回</button>`);
+    $('okB').onclick=()=>{refundV(o,+j,S.admin.name+' 为客户');closeSheet();toast('已退款');render()};$('noB').onclick=closeSheet});
+}
+function readImg(file,crop,cb){const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');
+  if(crop){c.width=1280;c.height=720;const r=Math.max(1280/im.width,720/im.height),w=im.width*r,h=im.height*r;c.getContext('2d').drawImage(im,(1280-w)/2,(720-h)/2,w,h)}
+  else{const w=Math.min(1080,im.width),h=Math.round(im.height*w/im.width);c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h)}
+  cb(c.toDataURL('image/jpeg',.82))};im.onerror=()=>toast('这张图片打不开，请换一张');im.src=rd.result};rd.readAsDataURL(file)}
+let draft=null;
+function aProducts(){
+  if(S.peditId!==null){aProductEdit();return}
+  const today=TODAY();
+  $('av').innerHTML=`<h3>商品管理</h3><p class="muted">老板和员工都可以上架、修改、下架活动商品。</p><button class="btn" id="npB">＋ 上架新商品</button>`+
+  products.slice().reverse().map(p=>{const exp=p.validUntil&&p.validUntil<today,out=p.left!=null&&p.left<=0;const st=!p.active?'已下架':exp?'已过期':out?'已售罄':'销售中';
+    return `<div class="item"><div class="thumbrow"><img src="${p.cover}" alt=""><div><div class="row"><b>${p.name}</b><span class="pill ${st==='销售中'?'':st==='已售罄'?'warn':'off'}">${st}</span></div><b style="color:var(--danger)">¥${p.price}</b>
+    <span class="muted">${p.stock==null?'不限量':`库存 ${p.stock}，剩 ${p.left}`} · 已售 ${p.sold} · 已核销 ${p.used}</span><span class="muted">${p.validUntil?'有效期至 '+p.validUntil:'长期有效'}</span></div></div>
+    <div class="row" style="gap:8px;justify-content:flex-start"><button class="btn ghost sm" data-ed="${p.id}">编辑</button><button class="btn sm ${p.active?'red':''}" data-tg="${p.id}">${p.active?'下架':'重新上架'}</button></div></div>`}).join('');
+  $('npB').onclick=()=>{S.peditId='';draft={name:'',price:'',stock:'',validUntil:'',desc:'',cover:'',images:[]};render()};
+  document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{const p=findP(b.dataset.ed);S.peditId=p.id;draft={name:p.name,price:String(p.price),stock:p.stock==null?'':String(p.stock),validUntil:p.validUntil,desc:p.desc,cover:p.cover,images:p.images.slice()};render()});
+  document.querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{const p=findP(b.dataset.tg);p.active=!p.active;toast(p.active?'已上架':'已下架，已卖出的券仍可核销和退款');render()});
+}
+function aProductEdit(){
+  const d=draft, p=S.peditId?findP(S.peditId):null;
+  $('av').innerHTML=`<button class="lnk" id="pbk" style="align-self:flex-start">‹ 返回商品列表</button><h3>${p?'编辑商品':'上架新商品'}</h3>
+  <div class="box">
+    <label class="ef">商品名称（最多30字）<input id="f_name" maxlength="30" value="${d.name.replace(/"/g,'&quot;')}" placeholder="例如：周六双打赛报名"></label>
+    <label class="ef">价格（元）<input id="f_price" inputmode="decimal" value="${d.price}" placeholder="例如：88"></label>
+    <label class="ef">库存（不限量请留空）${p&&p.sold?`<span class="muted">已售出 ${p.sold} 份</span>`:''}<input id="f_stock" inputmode="numeric" value="${d.stock}" placeholder="不限量"></label>
+    <label class="ef">有效期（不填表示长期有效；过期未使用自动全额退款）<input id="f_valid" type="date" min="${TODAY()}" value="${d.validUntil}"></label>
+    <label class="ef">文字说明（可不填）<textarea id="f_desc" maxlength="500">${d.desc}</textarea></label>
+  </div>
+  <div class="box"><b>封面图（16:9）</b><span class="muted">显示在活动卡片上方和详情页顶部，建议 1280×720 像素。试玩页自动取中间部分裁剪，正式版可以自己框选。</span>
+    ${d.cover?`<img class="bn-thumb" src="${d.cover}" alt="封面">`:''}<label class="btn ghost" style="text-align:center">${d.cover?'更换封面':'上传封面'}<input type="file" accept="image/*" id="f_cover" hidden></label></div>
+  <div class="box"><b>详情图（${d.images.length}/9）</b><span class="muted">按顺序从上往下显示在详情页，比例不限。</span>
+    <div class="imgs">${d.images.map((src,i)=>`<div><img src="${src}" alt="详情图 ${i+1}"><div class="row"><span class="muted">第 ${i+1} 张</span><span class="row" style="gap:6px">${i?`<button class="btn ghost sm" data-iu="${i}">上移</button>`:''}<button class="btn red sm" data-id="${i}">删除</button></span></div></div>`).join('')}</div>
+    <label class="btn ghost" style="text-align:center;${d.images.length>=9?'opacity:.4;pointer-events:none':''}">＋ 添加详情图<input type="file" accept="image/*" multiple id="f_imgs" hidden></label></div>
+  <button class="btn" id="psave">${p?'保存修改':'上架'}</button>${p?'<span class="muted">修改价格不影响已付款的订单</span>':''}`;
+  const sync=()=>{d.name=$('f_name').value;d.price=$('f_price').value;d.stock=$('f_stock').value;d.validUntil=$('f_valid').value;d.desc=$('f_desc').value};
+  $('pbk').onclick=()=>{S.peditId=null;draft=null;render()};
+  $('f_cover').onchange=e=>{sync();const f=e.target.files[0];if(f)readImg(f,true,u=>{d.cover=u;render()})};
+  $('f_imgs').onchange=e=>{sync();[...e.target.files].slice(0,9-d.images.length).forEach(f=>readImg(f,false,u=>{if(d.images.length<9){d.images.push(u);render()}}))};
+  document.querySelectorAll('[data-iu]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.iu;[d.images[i-1],d.images[i]]=[d.images[i],d.images[i-1]];render()});
+  document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{sync();d.images.splice(+b.dataset.id,1);render()});
+  $('psave').onclick=()=>{sync();const name=d.name.trim(),price=Math.round(+d.price*100)/100,stock=d.stock.trim()===''?null:+d.stock;
+    if(!name)return toast('请填写商品名称');if(!(price>=0.01))return toast('请填写正确的价格');
+    if(stock!==null&&(!Number.isInteger(stock)||stock<0))return toast('库存请填整数，不限量请留空');
+    if(!d.cover)return toast('请上传封面图');
+    if(p){if(stock!==null&&stock<p.sold)return toast(`库存不能少于已售出的 ${p.sold} 份`);Object.assign(p,{name,price,stock,left:stock==null?null:stock-p.sold,validUntil:d.validUntil,desc:d.desc,cover:d.cover,images:d.images});toast('已保存')}
+    else{products.push({id:'P'+Date.now(),name,price,stock,left:stock,sold:0,used:0,validUntil:d.validUntil,desc:d.desc,cover:d.cover,images:d.images,active:true});toast('已上架，客户端“活动”里可以看到了')}
+    S.peditId=null;draft=null;render()};
+}
+function aNotice(){
+  $('av').innerHTML=`<h3>消息通知</h3><p class="muted">正式版中，这些会通过微信发送给老板。</p>
+  ${notices.length?notices.map(n=>`<div class="item"><span class="muted">${n.at}</span><span>${n.t}</span></div>`).join(''):'<p class="muted">暂无通知。</p>'}`;
+}
+function aPrice(){
+  const t=TODAY(), cur=ruleFor(t);
+  const st=r=>r.from>t?'<span class="pill warn">待生效</span>':r===cur?'<span class="pill">执行中</span>':'<span class="pill off">已失效</span>';
+  $('av').innerHTML=`<h3>价格设置</h3>
+  <div class="stats"><div class="stat"><span class="muted">当前工作日价</span><b>¥${cur.weekday}/小时</b></div><div class="stat"><span class="muted">当前节假日价（含周末）</span><b>¥${cur.holiday}/小时</b></div></div>
+  <div class="box"><b>设置新价格</b>
+    <div class="form"><label>工作日 ¥ <input id="pw1" type="number" min="1" value="${cur.weekday}" style="width:80px"></label><label>节假日 ¥ <input id="pw2" type="number" min="1" value="${cur.holiday}" style="width:80px"></label></div>
+    <div class="form"><label><input type="radio" name="when" id="wNow" checked> 立即生效</label><label><input type="radio" name="when" id="wDate"> 从指定日期起</label><input type="date" id="wD" min="${addD(t,1)}" value="${addD(t,7)}"></div>
+    <div><button class="btn" id="saveP">保存</button></div>
+    <p class="muted">已支付的订单按下单时价格，不受影响。立即生效后，客人刷新即看到新价格。</p></div>
+  <b>价格记录</b><div class="tbl-wrap"><table class="tbl"><tr><th>生效日期</th><th>工作日</th><th>节假日</th><th>设置人</th><th>设置时间</th><th>状态</th><th></th></tr>
+  ${rules.slice().sort((a,b)=>b.from.localeCompare(a.from)).map(r=>`<tr><td>${r.from}</td><td>¥${r.weekday}</td><td>¥${r.holiday}</td><td>${r.by}</td><td>${r.at}</td><td>${st(r)}</td><td>${r.from>t?`<button class="btn red sm" data-rm="${rules.indexOf(r)}">删除</button>`:''}</td></tr>`).join('')}</table></div>`;
+  $('saveP').onclick=()=>{const a=+$('pw1').value,b=+$('pw2').value;if(!(a>0&&b>0))return toast('请填写正确的价格');
+    const from=$('wNow').checked?t:$('wD').value;if(!from||from<t)return toast('请选择今天以后的日期');
+    rules.push({from,weekday:a,holiday:b,by:S.admin.name,at:nowText()});toast(from===t?'新价格已生效':`将于 ${from} 起生效`);render()};
+  document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{rules.splice(+b.dataset.rm,1);toast('已删除');render()});
+}
+function aBanner(){
+  const n=banners.length, full=n>=5;
+  $('av').innerHTML=`<h3>广告牌</h3><p class="muted">老板和员工都可以管理。显示在客人“订场”页最上方，每张停留10秒，客人也能左右滑动；可以设置点击后打开某个活动商品。最多5张，比例 16:9（建议 1280×720 或 1920×1080 像素）。</p>
+  ${n?banners.map((b,i)=>`<div class="item"><img class="bn-thumb" src="${b.src}" alt="第${i+1}张"><label class="row">点击后打开<select data-lk="${i}"><option value="">不链接</option>${products.filter(x=>x.active).map(x=>`<option value="${x.id}" ${b.pid===x.id?'selected':''}>${x.name}</option>`).join('')}</select></label><div class="row"><span class="muted">第 ${i+1} 张</span><span class="row" style="gap:6px">${i?`<button class="btn ghost sm" data-mv="${i}" data-dir="-1">上移</button>`:''}${i<n-1?`<button class="btn ghost sm" data-mv="${i}" data-dir="1">下移</button>`:''}<button class="btn red sm" data-del="${i}">删除</button></span></div></div>`).join(''):'<p class="muted">还没有广告图，客人端暂时不显示广告牌。</p>'}
+  <label class="btn" style="text-align:center;${full?'opacity:.4;pointer-events:none':''}">${full?'已满5张':`添加图片（${n}/5）`}<input type="file" accept="image/*" id="bnFile" hidden></label>
+  <p class="muted">示例：上传后自动取图片中间部分裁成 16:9。正式版在手机上可以自己框选裁剪范围。</p>`;
+  document.querySelectorAll('[data-lk]').forEach(s=>s.onchange=()=>{banners[+s.dataset.lk].pid=s.value;toast('已设置')});
+  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{const i=+b.dataset.mv,j=i+(+b.dataset.dir);[banners[i],banners[j]]=[banners[j],banners[i]];S.bi=0;render()});
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const i=+b.dataset.del;
+    sheet(`<h3>删除第 ${i+1} 张广告图？</h3><p>删除后客人端马上看不到。</p><button class="btn red" id="okB">确定删除</button><button class="btn ghost" id="noB">取消</button>`);
+    $('okB').onclick=()=>{banners.splice(i,1);S.bi=0;closeSheet();toast('已删除');render()};$('noB').onclick=closeSheet;});
+  const f=$('bnFile');if(f)f.onchange=()=>{const file=f.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{
+    const W=1280,H=720,c=document.createElement('canvas');c.width=W;c.height=H;const r=Math.max(W/im.width,H/im.height),w=im.width*r,h=im.height*r;
+    c.getContext('2d').drawImage(im,(W-w)/2,(H-h)/2,w,h);banners.push({src:c.toDataURL('image/jpeg',.82),pid:''});toast('已添加');render()};im.onerror=()=>toast('这张图片打不开，请换一张');im.src=rd.result};rd.readAsDataURL(file)};
+}
+function aHours(){
+  const opt=(a,b,v)=>[...Array(b-a+1)].map((_,i)=>`<option ${a+i===v?'selected':''}>${a+i}</option>`).join('');
+  const marks=[...[...hol].map(d=>[d,'节假日']),...[...work].map(d=>[d,'调休上班'])].sort();
+  $('av').innerHTML=`<h3>营业时间与节假日</h3>
+  <div class="box"><b>营业时间（北京时间）</b><div class="form"><select id="ho">${opt(5,12,settings.open)}</select> 点 至 <select id="hc">${opt(18,24,settings.close)}</select> 点 <button class="btn" id="saveH">保存</button></div><p class="muted">已付款的订单不受影响。</p></div>
+  <div class="box"><b>节假日标记</b><p class="muted">周末默认按节假日价。法定节假日请标为“节假日”，调休要上班的周末请标为“调休上班”（按工作日价）。</p>
+    <div class="form"><input type="date" id="hd" value="${TODAY()}"><button class="btn" id="mH">设为节假日</button><button class="btn ghost" id="mW">设为调休上班</button><button class="btn red" id="mC">恢复默认</button></div>
+    ${marks.length?`<div class="tbl-wrap"><table class="tbl"><tr><th>日期</th><th>类型</th><th>价格</th></tr>${marks.map(([d,t])=>`<tr><td>${d}</td><td>${t}</td><td>¥${price(d)}</td></tr>`).join('')}</table></div>`:'<p class="muted">暂无手动标记的日期。</p>'}</div>`;
+  $('saveH').onclick=()=>{const o=+$('ho').value,c=+$('hc').value;if(o>=c)return toast('结束时间要晚于开始时间');settings.open=o;settings.close=c;toast('营业时间已更新');render()};
+  const d=()=>$('hd').value;
+  $('mH').onclick=()=>{if(!d())return;hol.add(d());work.delete(d());render()};
+  $('mW').onclick=()=>{if(!d())return;work.add(d());hol.delete(d());render()};
+  $('mC').onclick=()=>{hol.delete(d());work.delete(d());render()};
+}
+function aReport(){
+  const t=TODAY(), paid=orders.filter(o=>o.status==='已支付'), ds=days7();
+  const today=paid.filter(o=>o.date===t), week=paid.filter(o=>ds.includes(o.date));
+  const hrs=settings.close-settings.open, used=today.reduce((s,o)=>s+o.slots.length,0);
+  const byCourt=[...Array(COURTS)].map((_,i)=>week.reduce((s,o)=>s+o.slots.filter(x=>x.c===i+1).length,0));
+  const byHour={};week.forEach(o=>o.slots.forEach(x=>byHour[x.h]=(byHour[x.h]||0)+1));
+  const mx=Math.max(1,...byCourt), mh=Math.max(1,...Object.values(byHour));
+  const refunds=orders.filter(o=>o.status==='已退款').reduce((s,o)=>s+o.amt,0);
+  $('av').innerHTML=`<h3>营收报表</h3><div class="stats">
+  <div class="stat"><span class="muted">今日订场营收</span><b>¥${today.reduce((s,o)=>s+o.amt,0)}</b></div>
+  <div class="stat"><span class="muted">未来7天已订金额</span><b>¥${week.reduce((s,o)=>s+o.amt,0)}</b></div>
+  <div class="stat"><span class="muted">今日场地使用率</span><b>${Math.round(used/(COURTS*hrs)*100)}%</b></div>
+  <div class="stat"><span class="muted">累计订场退款</span><b>¥${refunds}</b></div><div class="stat"><span class="muted">活动收款（已扣退款）</span><b>¥${porders.reduce((t,o)=>t+o.amt-o.refund,0)}</b></div></div>
+  <div class="box"><b>各场地使用小时数（未来7天）</b>${byCourt.map((n,i)=>`<div class="hbar"><span>${i+1}号场</span><div style="width:${n/mx*100}%"></div><span>${n}</span></div>`).join('')}</div>
+  <div class="box"><b>热门时段（未来7天）</b>${[...Array(hrs)].map((_,i)=>{const h=settings.open+i,n=byHour[h]||0;return `<div class="hbar"><span>${h}:00</span><div style="width:${n/mh*100}%"></div><span>${n}</span></div>`}).join('')}</div>`;
+}
+function aStaff(){
+  $('av').innerHTML=`<h3>员工账号</h3><p class="muted">员工可以：核销、查看订单和客户电话、取消退款、锁场/解锁、管理活动商品和广告牌。价格、营业时间、报表、员工管理只有老板能操作。</p>
+  <div class="tbl-wrap"><table class="tbl"><tr><th>姓名</th><th>登录账号</th><th>角色</th><th>状态</th><th></th></tr>
+  ${staff.map((s,i)=>`<tr><td>${s.name}</td><td>${s.acc}</td><td>${s.role}</td><td>${s.active?'<span class="pill">启用</span>':'<span class="pill off">已停用</span>'}</td><td>${s.role==='员工'?`<button class="btn ghost sm" data-tg="${i}">${s.active?'停用':'启用'}</button>`:''}</td></tr>`).join('')}</table></div>
+  <div class="box"><b>新增员工</b><div class="form"><input id="sn" placeholder="姓名"><input id="sa" placeholder="登录账号（字母或数字）"><button class="btn" id="addS">新增</button></div><p class="muted">新员工首次登录需要修改初始密码。</p></div>`;
+  document.querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{const s=staff[+b.dataset.tg];s.active=!s.active;toast(s.active?'已启用':'已停用，该员工无法再登录');render()});
+  $('addS').onclick=()=>{const n=$('sn').value.trim(),a=$('sa').value.trim();if(!n||!/^[A-Za-z0-9]+$/.test(a))return toast('请填写姓名和账号（字母或数字）');if(staff.some(s=>s.acc===a))return toast('这个账号已存在');staff.push({name:n,acc:a,role:'员工',active:true});toast('已新增 '+n);render()};
+}
+function aLog(){
+  $('av').innerHTML=`<h3>电话查看记录</h3><p class="muted">谁在什么时候看过哪位客户的电话，都记在这里。</p>
+  ${viewLog.length?`<div class="tbl-wrap"><table class="tbl"><tr><th>时间</th><th>查看人</th><th>订单号</th><th>号码</th></tr>${viewLog.map(v=>`<tr><td>${v.at}</td><td>${v.who}</td><td>${v.id}</td><td>${v.ph}</td></tr>`).join('')}</table></div>`:'<p class="muted">暂无记录。去“订单管理”点一次“查看”试试。</p>'}`;
+}
+
+render();
+bnRestart();
+</script>
+
+</body></html>

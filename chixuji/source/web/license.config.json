@@ -1,0 +1,9 @@
+{
+  "server": "http://localhost:8080",
+  "publicKey": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "sPX9t64T-EP4EFGqIRAizk2o97G93GgqbQAE3Y1mstY",
+    "y": "9SdOrnpZLM--vcBHI1iGG7G-L7MxoySBk_YXOahh1Ug"
+  }
+}

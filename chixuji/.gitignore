@@ -1,0 +1,11 @@
+build/
+app/build/
+.gradle/
+local.properties
+*.iml
+.idea/
+source/web/dist/
+source/web/dist-local/
+source/web/dist-pages/
+source/android/
+node_modules/
